@@ -11,8 +11,12 @@ import { Colors } from "@/constants/Colors";
 import Filters from "@/components/Filters";
 
 import "@/styles/styles.css";
+import api from "@/api/api";
+import { useEffect, useState } from "react";
+import ITool from "@/interface/tool.interface";
 
 export default function HomeScreen() {
+  const [tools, setTools] = useState<ITool[]>();
   const DATA = [
     {
       id: "1",
@@ -51,12 +55,30 @@ export default function HomeScreen() {
         "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
     },
   ];
+
+  const getArtTools = async () => {
+    try {
+      const response = await api.get("art-tools");
+      console.log(response.data);
+      if(response.status == 200) {
+        setTools(response.data)
+      } else {
+        console.error("Error fetching art tools: ", error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getArtTools();
+  }, []);
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
-      <SearchBar />
+      <SearchBar value="" onChangeText={() => {}} />
       <ThemedText
         type="subtitle"
         lightColor={Colors.light.subtitle}

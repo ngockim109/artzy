@@ -1,4 +1,4 @@
-import { FlatList, Pressable } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -6,6 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
 
 import "@/styles/styles.css";
+import Badge from "./atoms/Badge";
 
 const Filters = () => {
   const theme = useColorScheme() ?? "light";
@@ -16,7 +17,7 @@ const Filters = () => {
       icon: (
         <AntDesign
           name="caretdown"
-          size={16}
+          size={14}
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
         />
       ),
@@ -27,7 +28,7 @@ const Filters = () => {
       icon: (
         <AntDesign
           name="caretdown"
-          size={16}
+          size={14}
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
         />
       ),
@@ -38,7 +39,7 @@ const Filters = () => {
       icon: (
         <AntDesign
           name="caretdown"
-          size={16}
+          size={14}
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
         />
       ),
@@ -49,7 +50,7 @@ const Filters = () => {
       icon: (
         <AntDesign
           name="caretdown"
-          size={16}
+          size={14}
           color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
         />
       ),
@@ -57,7 +58,7 @@ const Filters = () => {
   ];
 
   const handleSelectFilter = (item) => {
-    console.log("Selected filter:", item.text);
+    console.log("Selected filter:", item);
   };
 
   return (
@@ -66,22 +67,40 @@ const Filters = () => {
       horizontal
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
-        <Pressable
-          onPress={handleSelectFilter}
-          className="flex items-center justify-center w-full"
-        >
-          <ThemedText
-            lightColor={Colors.light.text}
-            darkColor={Colors.dark.text}
+        <View className="relative">
+          <Pressable
+            style={styles.pressable}
+            onPress={() => handleSelectFilter(item)}
+            className={`flex flex-row gap-1 items-center justify-center mr-5 border rounded-full px-3 py-1 ${
+              theme === "light" ? " border-primary" : " border-primary-light"
+            }`}
           >
-            {item?.text}{" "}
-          </ThemedText>
-          {item?.icon}
-        </Pressable>
+            <ThemedText
+              lightColor={Colors.light.buttonOutlineText}
+              darkColor={Colors.dark.buttonOutlineText}
+            >
+              {item?.text}
+            </ThemedText>
+            {item?.icon}
+            <Badge
+              lightColor={Colors.light.badge}
+              darkColor={Colors.dark.badge}
+              textDarkColor={Colors.dark.badgeText}
+              textLightColor={Colors.light.badgeText}
+              text="1"
+            />
+          </Pressable>
+        </View>
       )}
       keyExtractor={(item) => item?.id}
     />
   );
 };
+
+const styles = StyleSheet.create({
+  pressable: {
+    overflow: "visible", // Ensure that the badge is not cut off
+  },
+});
 
 export default Filters;

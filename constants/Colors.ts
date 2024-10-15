@@ -9,6 +9,10 @@ const tintColorDark = "#E76F51";
 export const Colors = {
   light: {
     text: "#11181C",
+    buttonOutlineText: "#E76F51",
+    badge: "#E76F51",
+    search: "#E76F51",
+    badgeText: "#fff",
     title: "#E76F51",
     subtitle: "#E76F51",
     background: "#fff",
@@ -20,6 +24,10 @@ export const Colors = {
   },
   dark: {
     text: "#ECEDEE",
+    buttonOutlineText: "#E76F51",
+    badge: "#E76F51",
+    search: "#E76F51",
+    badgeText: "#fff",
     title: "#E76F51",
     subtitle: "#E76F51",
     background: "#151718",
