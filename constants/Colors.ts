@@ -5,36 +5,43 @@
 
 const tintColorLight = "#E76F51";
 const tintColorDark = "#E76F51";
+const primaryColor = "#E76F51";
+const primaryColorDark = "#E76F51";
+const highlightColor = "#FF0000";
 
 export const Colors = {
   light: {
+    primary: primaryColor,
     text: "#11181C",
-    buttonOutlineText: "#E76F51",
-    badge: "#E76F51",
-    search: "#E76F51",
+    buttonOutlineText: primaryColor,
+    badge: primaryColor,
+    search: primaryColor,
+    highlight: highlightColor,
     badgeText: "#fff",
-    title: "#E76F51",
-    subtitle: "#E76F51",
-    background: "#fff",
+    title: primaryColor,
+    subtitle: primaryColor,
+    background: "#FAFAFA",
     tint: tintColorLight,
-    icon: "#E76F51",
-    link: "#E76F51",
-    tabIconDefault: "#E76F51",
+    icon: primaryColor,
+    link: primaryColor,
+    tabIconDefault: primaryColor,
     tabIconSelected: tintColorLight,
   },
   dark: {
+    primary: primaryColor,
     text: "#ECEDEE",
-    buttonOutlineText: "#E76F51",
-    badge: "#E76F51",
-    search: "#E76F51",
+    buttonOutlineText: primaryColorDark,
+    badge: primaryColorDark,
+    search: primaryColorDark,
+    highlight: highlightColor,
     badgeText: "#fff",
-    title: "#E76F51",
-    subtitle: "#E76F51",
+    title: primaryColorDark,
+    subtitle: primaryColorDark,
     background: "#151718",
     tint: tintColorDark,
-    icon: "#E76F51",
-    link: "#E76F51",
-    tabIconDefault: "#E76F51",
+    icon: primaryColorDark,
+    link: primaryColorDark,
+    tabIconDefault: primaryColorDark,
     tabIconSelected: tintColorDark,
   },
 };

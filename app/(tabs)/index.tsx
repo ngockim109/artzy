@@ -14,6 +14,8 @@ import "@/styles/styles.css";
 import api from "@/api/api";
 import { useEffect, useState } from "react";
 import ITool from "@/interface/tool.interface";
+import Tools from "@/components/Tools";
+import Empty from "@/components/Empty";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>();
@@ -60,8 +62,8 @@ export default function HomeScreen() {
     try {
       const response = await api.get("art-tools");
       console.log(response.data);
-      if(response.status == 200) {
-        setTools(response.data)
+      if (response.status == 200) {
+        setTools(response.data);
       } else {
         console.error("Error fetching art tools: ", error);
       }
@@ -95,6 +97,11 @@ export default function HomeScreen() {
       >
         All products
       </ThemedText>
+      {tools == null || tools.length <= 0 ? (
+        <Empty />
+      ) : (
+        <Tools toolData={tools} />
+      )}
     </ParallaxScrollView>
   );
 }

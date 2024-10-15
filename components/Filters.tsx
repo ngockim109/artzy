@@ -24,7 +24,7 @@ const Filters = () => {
     },
     {
       id: "2",
-      text: "Categories",
+      text: "Price",
       icon: (
         <AntDesign
           name="caretdown"
@@ -67,13 +67,17 @@ const Filters = () => {
       horizontal
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
-        <View className="relative">
+        <View className="relative py-3">
           <Pressable
-            style={styles.pressable}
             onPress={() => handleSelectFilter(item)}
-            className={`flex flex-row gap-1 items-center justify-center mr-5 border rounded-full px-3 py-1 ${
-              theme === "light" ? " border-primary" : " border-primary-light"
-            }`}
+            style={({ pressed }) => [
+              styles.pressable,
+              {
+                opacity: pressed ? 0.7 : 1,
+                borderColor:
+                  theme === "light" ? Colors.light.search : Colors.dark.search,
+              },
+            ]}
           >
             <ThemedText
               lightColor={Colors.light.buttonOutlineText}
@@ -82,14 +86,14 @@ const Filters = () => {
               {item?.text}
             </ThemedText>
             {item?.icon}
-            <Badge
-              lightColor={Colors.light.badge}
-              darkColor={Colors.dark.badge}
-              textDarkColor={Colors.dark.badgeText}
-              textLightColor={Colors.light.badgeText}
-              text="1"
-            />
           </Pressable>
+          <Badge
+            lightColor={Colors.light.badge}
+            darkColor={Colors.dark.badge}
+            textDarkColor={Colors.dark.badgeText}
+            textLightColor={Colors.light.badgeText}
+            text="1"
+          />
         </View>
       )}
       keyExtractor={(item) => item?.id}
@@ -99,7 +103,17 @@ const Filters = () => {
 
 const styles = StyleSheet.create({
   pressable: {
-    overflow: "visible", // Ensure that the badge is not cut off
+    flexDirection: "row",
+    gap: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 50,
+    borderWidth: 1,
+    overflow: "visible",
+    marginRight: 15,
+    zIndex: 10,
   },
 });
 

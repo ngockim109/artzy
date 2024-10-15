@@ -6,7 +6,7 @@ type ITool = {
   glassSurface: boolean;
   image: string;
   brand: string;
-  limitedTimeDeal: string;
+  limitedTimeDeal: number;
 };
 
 export default ITool;
