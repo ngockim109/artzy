@@ -33,6 +33,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { ActivityIndicator } from "react-native";
 
 import "@/styles/styles.css";
+import { Colors } from "@/constants/Colors";
+import { ThemedView } from "@/components/ThemedView";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -67,7 +69,14 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return <ActivityIndicator size="large" />;
+    return (
+      <ThemedView className="align-middle">
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "light" ? Colors.light.icon : Colors.dark.icon}
+        />
+      </ThemedView>
+    );
   }
 
   return (
