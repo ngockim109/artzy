@@ -14,6 +14,7 @@ export type ThemedTextProps = TextProps & {
     | "link"
     | "highlight"
     | "remove"
+    | "blurText"
     | "subtext";
 };
 
@@ -35,6 +36,7 @@ export function ThemedText({
         type === "title" ? styles.title : undefined,
         type === "highlight" ? styles.highlight : undefined,
         type === "remove" ? styles.remove : undefined,
+        type === "blurText" ? styles.blurText : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   highlight: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     lineHeight: 24,
     color: Colors?.light.highlight,
@@ -74,6 +76,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 24,
     textDecorationLine: "line-through",
+  },
+  blurText: {
+    fontSize: 16,
+    lineHeight: 24,
   },
   subtitle: {
     fontSize: 18,

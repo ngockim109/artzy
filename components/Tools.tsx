@@ -8,6 +8,8 @@ import ToolCard from "@/components/molecules/ToolCard";
 import { ThemedView } from "./ThemedView";
 import { Colors } from "@/constants/Colors";
 import { roundNumber } from "@/utils/roundNumber";
+import { calculatePrice } from "@/utils/calculatePrice";
+import { averageRating } from "@/utils/averageRating";
 
 type IToolCard = {
   id: string;
@@ -51,26 +53,13 @@ const Tools = ({ toolData }: ToolsProps) => {
       darkColor={Colors.dark.background}
     >
       {toolData?.map((item: ITool) => {
-        let rating = 0;
-        let numberOfRating = item?.feedbacks?.length || 0;
-        let price =
-          item?.limitedTimeDeal > 0
-            ? roundNumber(item?.price - item?.price * item?.limitedTimeDeal, 2)
-            : item?.price;
-        let sumRating = 0;
-        item?.feedbacks &&
-          item?.feedbacks.length > 0 &&
-          item?.feedbacks?.forEach((fb) => {
-            sumRating += fb.rating;
-          });
-        rating = roundNumber(sumRating / numberOfRating, 2);
         return (
           <ToolCard
             deal={item?.limitedTimeDeal}
-            numberOfRating={numberOfRating}
+            numberOfRating={item?.feedbacks?.length ?? 0}
             oldPrice={item?.price}
-            price={price}
-            rating={numberOfRating > 0 ? rating : 0}
+            price={calculatePrice(item?.limitedTimeDeal, item?.price)}
+            rating={averageRating(item?.feedbacks)}
             source={item?.image}
             toolName={item?.artName}
             key={item?.id}

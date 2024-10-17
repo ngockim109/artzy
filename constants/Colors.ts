@@ -14,12 +14,18 @@ const primaryColorDark = "#E76F51";
 const highlightColor = "#FF0000";
 const grayLight = "rgb(243 244 246)";
 const grayLightDark = "rgb(243 244 246)";
+const gray = "rgb(107 114 128)";
+const slate = "rgb(229 231 235)";
+const slateDark = "rgb(229 231 235)";
+const grayDark = "rgb(107 114 128)";
 
 export const Colors = {
   light: {
     primary: primaryColor,
     secondary: secondaryColor,
     grayLight: grayLight,
+    gray: gray,
+    slate: slate,
     text: "#11181C",
     buttonOutlineText: primaryColor,
     badge: secondaryColor,
@@ -40,6 +46,8 @@ export const Colors = {
     primary: primaryColor,
     secondary: secondaryColorDark,
     grayLight: grayLightDark,
+    gray: grayDark,
+    slate: slate,
     text: "#ECEDEE",
     buttonOutlineText: primaryColorDark,
     badge: secondaryColorDark,

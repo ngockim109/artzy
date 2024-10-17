@@ -8,6 +8,7 @@ type ITool = {
   glassSurface: boolean;
   image: string;
   brand: string;
+  brandImage: string;
   limitedTimeDeal: number;
   feedbacks: IFeedback[];
 };

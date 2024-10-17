@@ -64,28 +64,32 @@ const ToolCard = ({
               </ThemedText>
             </View>
             {deal > 0 && (
-              <View className="w-28">
+              <View className="w-28 my-1">
                 <CommonBadge text="Limited time deal" status="highlight" />
               </View>
             )}
-            <View className="flex-row">
-              <ThemedText type="defaultSemiBold">${price}</ThemedText>
+            <View className="flex-row justify-between">
+              <View className="flex-row ">
+                <ThemedText type="subtitle">${price}</ThemedText>
+                {deal > 0 && (
+                  <ThemedText type="remove" className="ml-2">
+                    ${oldPrice}
+                  </ThemedText>
+                )}
+              </View>
+
               {deal > 0 && (
-                <ThemedText type="remove" className="ml-2">
-                  ${oldPrice}
-                </ThemedText>
+                <View>
+                  <ThemedText
+                    type="highlight"
+                    lightColor={Colors.light.highlight}
+                    darkColor={Colors.dark.highlight}
+                  >
+                    -{deal * 100}%
+                  </ThemedText>
+                </View>
               )}
             </View>
-
-            {deal > 0 && (
-              <ThemedText
-                type="highlight"
-                lightColor={Colors.light.highlight}
-                darkColor={Colors.dark.highlight}
-              >
-                -{deal * 100}%
-              </ThemedText>
-            )}
           </View>
         </View>
       </Pressable>
