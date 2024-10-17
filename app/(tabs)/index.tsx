@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Platform, View, Text } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Platform,
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 
 import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
@@ -16,9 +23,15 @@ import { useEffect, useState } from "react";
 import ITool from "@/interface/tool.interface";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
+import IBrand from "@/interface/brand.interface";
+import Loading from "@/components/Loading";
+import LoadingSmall from "@/components/LoadingSmall";
 
 export default function HomeScreen() {
-  const [tools, setTools] = useState<ITool[]>();
+  const [tools, setTools] = useState<ITool[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
+  const [brandLoading, setBrandLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const DATA = [
     {
       id: "1",
@@ -60,10 +73,25 @@ export default function HomeScreen() {
 
   const getArtTools = async () => {
     try {
+      setLoading(true);
+      setBrandLoading(true);
       const response = await api.get("art-tools");
       console.log(response.data);
       if (response.status == 200) {
         setTools(response.data);
+        setLoading(false);
+        const brandData = response.data.map((data) => ({
+          id: data.brand,
+          brand: data.brand,
+          brandImage: data.brandImage,
+        }));
+
+        const uniqueBrandData = brandData.filter(
+          (brandItem: IBrand, index, self) =>
+            index === self.findIndex((b) => b.brand === brandItem.brand)
+        );
+        setBrands(uniqueBrandData);
+        setBrandLoading(false);
       } else {
         console.error("Error fetching art tools: ", error);
       }
@@ -88,7 +116,13 @@ export default function HomeScreen() {
       >
         All brands
       </ThemedText>
-      <Brands DATA={DATA} />
+      {brandLoading ? (
+        <LoadingSmall />
+      ) : brands === null || brands.length <= 0 ? (
+        <Empty />
+      ) : (
+        <Brands DATA={brands} />
+      )}
       <Filters />
       <ThemedText
         type="subtitle"
@@ -97,7 +131,9 @@ export default function HomeScreen() {
       >
         All products
       </ThemedText>
-      {tools == null || tools.length <= 0 ? (
+      {loading ? (
+        <LoadingSmall />
+      ) : tools == null || tools.length <= 0 ? (
         <Empty />
       ) : (
         <Tools toolData={tools} />
