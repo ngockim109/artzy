@@ -1,11 +1,11 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import { ThemedText } from "@/components/ThemedText";
 import CommonBadge from "@/components/atoms/CommonBadge";
 import { Colors } from "@/constants/Colors";
 import FavoriteIcon from "../atoms/FavoriteIcon";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 
 type ToolsProps = {
   source: string;
@@ -34,53 +34,60 @@ const ToolCard = ({
         color={Colors.light.highlight}
         className="absolute right-1 top-1 bg-gray-100 rounded-full p-2"
       />
-      {/* <Link href="/"> */}
-      <View>
-        <Image
-          style={styles.image}
-          source={{ uri: source }}
-          resizeMode="contain"
-        />
-        <View style={styles.cardContent}>
-          <ThemedText>{toolName}</ThemedText>
-          <View className="flex-row">
-            <ThemedText type="subtext">{rating}</ThemedText>
-            <StarRatingDisplay
-              rating={rating}
-              starSize={16}
-              style={{ alignItems: "center" }}
-              starStyle={{ marginRight: 0, marginLeft: 0 }}
-            />
-            <ThemedText className="text-slate-300" type="subtext">
-              ({numberOfRating})
-            </ThemedText>
-          </View>
-          {deal > 0 && (
-            <View className="w-28">
-              <CommonBadge text="Limited time deal" status="highlight" />
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: "/tools/[id]",
+            params: { id: id },
+          })
+        }
+      >
+        <View>
+          <Image
+            style={styles.image}
+            source={{ uri: source }}
+            resizeMode="contain"
+          />
+          <View style={styles.cardContent}>
+            <ThemedText>{toolName}</ThemedText>
+            <View className="flex-row">
+              <ThemedText type="subtext">{rating}</ThemedText>
+              <StarRatingDisplay
+                rating={rating}
+                starSize={16}
+                style={{ alignItems: "center" }}
+                starStyle={{ marginRight: 0, marginLeft: 0 }}
+              />
+              <ThemedText className="text-slate-300" type="subtext">
+                ({numberOfRating})
+              </ThemedText>
             </View>
-          )}
-          <View className="flex-row">
-            <ThemedText type="defaultSemiBold">${price}</ThemedText>
             {deal > 0 && (
-              <ThemedText type="remove" className="ml-2">
-                ${oldPrice}
+              <View className="w-28">
+                <CommonBadge text="Limited time deal" status="highlight" />
+              </View>
+            )}
+            <View className="flex-row">
+              <ThemedText type="defaultSemiBold">${price}</ThemedText>
+              {deal > 0 && (
+                <ThemedText type="remove" className="ml-2">
+                  ${oldPrice}
+                </ThemedText>
+              )}
+            </View>
+
+            {deal > 0 && (
+              <ThemedText
+                type="highlight"
+                lightColor={Colors.light.highlight}
+                darkColor={Colors.dark.highlight}
+              >
+                -{deal * 100}%
               </ThemedText>
             )}
           </View>
-
-          {deal > 0 && (
-            <ThemedText
-              type="highlight"
-              lightColor={Colors.light.highlight}
-              darkColor={Colors.dark.highlight}
-            >
-              -{deal * 100}%
-            </ThemedText>
-          )}
         </View>
-      </View>
-      {/* </Link> */}
+      </Pressable>
     </View>
   );
 };

@@ -70,7 +70,7 @@ export default function RootLayout() {
 
   if (!loaded) {
     return (
-      <ThemedView className="align-middle">
+      <ThemedView className="align-middle justify-center">
         <ActivityIndicator
           size="large"
           color={colorScheme === "light" ? Colors.light.icon : Colors.dark.icon}

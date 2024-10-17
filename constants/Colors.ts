@@ -6,18 +6,23 @@
 const tintColorLight = "#E76F51";
 const tintColorDark = "#E76F51";
 const primaryColor = "#E76F51";
+const secondaryColor = "#F4A261";
+const secondaryColorDark = "#F4A261";
+const thirdColor = "rgb(243 244 246)";
+const thirdColorDark = "rgb(243 244 246)";
 const primaryColorDark = "#E76F51";
 const highlightColor = "#FF0000";
 
 export const Colors = {
   light: {
     primary: primaryColor,
+    secondary: secondaryColor,
     text: "#11181C",
     buttonOutlineText: primaryColor,
-    badge: primaryColor,
+    badge: secondaryColor,
     search: primaryColor,
     highlight: highlightColor,
-    badgeText: "#fff",
+    badgeText: "#000",
     title: primaryColor,
     subtitle: primaryColor,
     background: "#FAFAFA",
@@ -30,12 +35,13 @@ export const Colors = {
   },
   dark: {
     primary: primaryColor,
+    secondary: secondaryColorDark,
     text: "#ECEDEE",
     buttonOutlineText: primaryColorDark,
-    badge: primaryColorDark,
+    badge: secondaryColorDark,
     search: primaryColorDark,
     highlight: highlightColor,
-    badgeText: "#fff",
+    badgeText: "#000",
     title: primaryColorDark,
     subtitle: primaryColorDark,
     background: "#151718",

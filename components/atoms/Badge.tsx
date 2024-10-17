@@ -6,6 +6,7 @@ import "@/styles/styles.css";
 type BadgeProps = {
   text: string;
   darkColor: string;
+  borderColor: string;
   textDarkColor: string;
   lightColor: string;
   textLightColor: string;
@@ -13,6 +14,7 @@ type BadgeProps = {
 const Badge = ({
   text,
   lightColor,
+  borderColor,
   textLightColor,
   darkColor,
   textDarkColor,
@@ -21,7 +23,8 @@ const Badge = ({
     <ThemedView
       lightColor={lightColor}
       darkColor={darkColor}
-      className={`absolute z-20 top-2 right-3 rounded-full w-6 h-6 flex items-center justify-center`}
+      style={{ borderColor: borderColor }}
+      className={`absolute z-20 top-2 right-3 rounded-full w-6 h-6 flex align-middle items-center justify-center`}
     >
       <ThemedText
         lightColor={textLightColor}

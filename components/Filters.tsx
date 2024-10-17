@@ -1,5 +1,5 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Colors } from "@/constants/Colors";
@@ -10,54 +10,32 @@ import Badge from "./atoms/Badge";
 
 const Filters = () => {
   const theme = useColorScheme() ?? "light";
+  const [activeIndex, setActiveIndex] = useState();
   const DATA = [
     {
       id: "1",
       text: "Filter",
-      icon: (
-        <AntDesign
-          name="caretdown"
-          size={14}
-          color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-        />
-      ),
+      icon: "caretdown",
     },
     {
       id: "2",
       text: "Price",
-      icon: (
-        <AntDesign
-          name="caretdown"
-          size={14}
-          color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-        />
-      ),
+      icon: "caretdown",
     },
     {
       id: "3",
       text: "GlassSurface",
-      icon: (
-        <AntDesign
-          name="caretdown"
-          size={14}
-          color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-        />
-      ),
+      icon: "caretdown",
     },
     {
       id: "4",
       text: "On sale",
-      icon: (
-        <AntDesign
-          name="caretdown"
-          size={14}
-          color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-        />
-      ),
+      icon: "caretdown",
     },
   ];
 
   const handleSelectFilter = (item) => {
+    setActiveIndex(item?.id ?? -1);
     console.log("Selected filter:", item);
   };
 
@@ -74,22 +52,53 @@ const Filters = () => {
               styles.pressable,
               {
                 opacity: pressed ? 0.7 : 1,
+                backgroundColor:
+                  activeIndex === item?.id
+                    ? theme === "light"
+                      ? Colors.light.primary
+                      : Colors.dark.primary
+                    : "white",
                 borderColor:
-                  theme === "light" ? Colors.light.search : Colors.dark.search,
+                  activeIndex === item?.id
+                    ? theme === "light"
+                      ? Colors.light.secondary
+                      : Colors.dark.secondary
+                    : theme === "light"
+                    ? Colors.light.search
+                    : Colors.dark.search,
               },
             ]}
           >
             <ThemedText
-              lightColor={Colors.light.buttonOutlineText}
-              darkColor={Colors.dark.buttonOutlineText}
+              lightColor={
+                activeIndex === item?.id
+                  ? "white"
+                  : Colors.light.buttonOutlineText
+              }
+              darkColor={
+                activeIndex === item?.id
+                  ? "white"
+                  : Colors.dark.buttonOutlineText
+              }
             >
               {item?.text}
             </ThemedText>
-            {item?.icon}
+            <AntDesign
+              name={item?.icon}
+              size={14}
+              color={
+                activeIndex === item?.id
+                  ? "white"
+                  : theme === "light"
+                  ? Colors.light.icon
+                  : Colors.dark.icon
+              }
+            />
           </Pressable>
           <Badge
             lightColor={Colors.light.badge}
             darkColor={Colors.dark.badge}
+            borderColor={Colors.light.primary}
             textDarkColor={Colors.dark.badgeText}
             textLightColor={Colors.light.badgeText}
             text="1"
