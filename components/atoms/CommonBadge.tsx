@@ -25,7 +25,7 @@ const CommonBadge = ({ text, status }: CommonBadgeProps) => {
       break;
   }
   return (
-    <View className="p-1 rounded-sm px-2" style={{ backgroundColor: color }}>
+    <View className="p-1 rounded-full px-2" style={{ backgroundColor: color }}>
       <Text className="text-white text-xs">{text}</Text>
     </View>
   );

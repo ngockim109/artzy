@@ -1,6 +1,7 @@
 import { Text, type TextProps, StyleSheet } from "react-native";
 
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { Colors } from "@/constants/Colors";
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
@@ -11,6 +12,8 @@ export type ThemedTextProps = TextProps & {
     | "defaultSemiBold"
     | "subtitle"
     | "link"
+    | "highlight"
+    | "remove"
     | "subtext";
 };
 
@@ -30,6 +33,8 @@ export function ThemedText({
         type === "default" ? styles.default : undefined,
         type === "subtext" ? styles.subtext : undefined,
         type === "title" ? styles.title : undefined,
+        type === "highlight" ? styles.highlight : undefined,
+        type === "remove" ? styles.remove : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
@@ -58,6 +63,17 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     lineHeight: 32,
+  },
+  highlight: {
+    fontSize: 18,
+    fontWeight: "bold",
+    lineHeight: 24,
+    color: Colors?.light.highlight,
+  },
+  remove: {
+    fontSize: 14,
+    lineHeight: 24,
+    textDecorationLine: "line-through",
   },
   subtitle: {
     fontSize: 18,

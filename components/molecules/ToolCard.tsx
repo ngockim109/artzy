@@ -2,8 +2,10 @@ import { View, Image, StyleSheet } from "react-native";
 import React from "react";
 import { ThemedText } from "@/components/ThemedText";
 import CommonBadge from "@/components/atoms/CommonBadge";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Colors } from "@/constants/Colors";
+import FavoriteIcon from "../atoms/FavoriteIcon";
+import { StarRatingDisplay } from "react-native-star-rating-widget";
+import { Link } from "expo-router";
 
 type ToolsProps = {
   source: string;
@@ -26,31 +28,59 @@ const ToolCard = ({
   id,
 }: ToolsProps) => {
   return (
-    <View className="flex-1 m-5 p-5 rounded-md bg-white">
-      <View className="relative">
+    <View style={styles.card} className="mb-5 rounded-md relative">
+      <FavoriteIcon
+        favorite={false}
+        color={Colors.light.highlight}
+        className="absolute right-1 top-1 bg-gray-100 rounded-full p-2"
+      />
+      {/* <Link href="/"> */}
+      <View>
         <Image
           style={styles.image}
           source={{ uri: source }}
           resizeMode="contain"
         />
-        <MaterialIcons name="favorite-border" size={20} color="black" />
-        <MaterialIcons name="favorite" size={20} color="black" />
+        <View style={styles.cardContent}>
+          <ThemedText>{toolName}</ThemedText>
+          <View className="flex-row">
+            <ThemedText type="subtext">{rating}</ThemedText>
+            <StarRatingDisplay
+              rating={rating}
+              starSize={16}
+              style={{ alignItems: "center" }}
+              starStyle={{ marginRight: 0, marginLeft: 0 }}
+            />
+            <ThemedText className="text-slate-300" type="subtext">
+              ({numberOfRating})
+            </ThemedText>
+          </View>
+          {deal > 0 && (
+            <View className="w-28">
+              <CommonBadge text="Limited time deal" status="highlight" />
+            </View>
+          )}
+          <View className="flex-row">
+            <ThemedText type="defaultSemiBold">${price}</ThemedText>
+            {deal > 0 && (
+              <ThemedText type="remove" className="ml-2">
+                ${oldPrice}
+              </ThemedText>
+            )}
+          </View>
+
+          {deal > 0 && (
+            <ThemedText
+              type="highlight"
+              lightColor={Colors.light.highlight}
+              darkColor={Colors.dark.highlight}
+            >
+              -{deal * 100}%
+            </ThemedText>
+          )}
+        </View>
       </View>
-      <ThemedText type="subtext">{toolName}</ThemedText>
-      <ThemedText>{rating}</ThemedText>
-      <ThemedText>{numberOfRating}</ThemedText>
-      <ThemedText>{price}</ThemedText>
-      <ThemedText>{oldPrice}</ThemedText>
-      {deal >= 0 && (
-        <ThemedText
-          type="defaultSemiBold"
-          lightColor={Colors.light.highlight}
-          darkColor={Colors.dark.highlight}
-        >
-          -{deal}%
-        </ThemedText>
-      )}
-      <CommonBadge text="Limited time deal" status="highlight" />
+      {/* </Link> */}
     </View>
   );
 };
@@ -60,6 +90,20 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 100,
     marginBottom: 10,
+  },
+  card: {
+    width: "48%",
+    shadowColor: "rgba(0, 0, 0, 0.24)",
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 3,
+    elevation: 5,
+    backgroundColor: "white",
+    borderRadius: 8,
+    paddingBottom: 10,
+    marginVertical: 10,
+  },
+  cardContent: {
+    paddingHorizontal: 10,
   },
 });
 export default ToolCard;

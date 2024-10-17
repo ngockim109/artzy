@@ -1,3 +1,5 @@
+import IFeedback from "./feedback.interface";
+
 type ITool = {
   id: string;
   artName: string;
@@ -7,6 +9,7 @@ type ITool = {
   image: string;
   brand: string;
   limitedTimeDeal: number;
+  feedbacks: IFeedback[];
 };
 
 export default ITool;
