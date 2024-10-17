@@ -12,11 +12,14 @@ const thirdColor = "rgb(243 244 246)";
 const thirdColorDark = "rgb(243 244 246)";
 const primaryColorDark = "#E76F51";
 const highlightColor = "#FF0000";
+const grayLight = "rgb(243 244 246)";
+const grayLightDark = "rgb(243 244 246)";
 
 export const Colors = {
   light: {
     primary: primaryColor,
     secondary: secondaryColor,
+    grayLight: grayLight,
     text: "#11181C",
     buttonOutlineText: primaryColor,
     badge: secondaryColor,
@@ -36,6 +39,7 @@ export const Colors = {
   dark: {
     primary: primaryColor,
     secondary: secondaryColorDark,
+    grayLight: grayLightDark,
     text: "#ECEDEE",
     buttonOutlineText: primaryColorDark,
     badge: secondaryColorDark,

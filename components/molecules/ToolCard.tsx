@@ -32,7 +32,8 @@ const ToolCard = ({
       <FavoriteIcon
         favorite={false}
         color={Colors.light.highlight}
-        className="absolute right-1 top-1 bg-gray-100 rounded-full p-2"
+        style={{ backgroundColor: Colors.light.grayLight }}
+        className="absolute right-1 top-1 rounded-full p-2"
       />
       <Pressable
         onPress={() =>
