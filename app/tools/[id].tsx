@@ -180,7 +180,12 @@ const ToolDetail = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => router.push(`/brands/[${tool?.brand}]`)}
+            onPress={() =>
+              router.push({
+                pathname: `/brands/[id]`,
+                params: { id: tool?.brand ?? "", brandImage: tool?.brandImage },
+              })
+            }
           >
             <ThemedView className="flex-row justify-between items-center">
               <ThemedView className="flex-row gap-2 items-center">

@@ -123,7 +123,6 @@ export default function HomeScreen() {
       ) : (
         <Brands DATA={brands} />
       )}
-      <Filters />
       <ThemedText
         type="subtitle"
         lightColor={Colors.light.subtitle}
@@ -131,6 +130,7 @@ export default function HomeScreen() {
       >
         All products
       </ThemedText>
+      <Filters />
       {loading ? (
         <LoadingSmall />
       ) : tools == null || tools.length <= 0 ? (
