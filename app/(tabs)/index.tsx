@@ -32,6 +32,7 @@ export default function HomeScreen() {
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [brandLoading, setBrandLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
   const DATA = [
     {
       id: "1",
@@ -76,7 +77,6 @@ export default function HomeScreen() {
       setLoading(true);
       setBrandLoading(true);
       const response = await api.get("art-tools");
-      console.log(response.data);
       if (response.status == 200) {
         setTools(response.data);
         setLoading(false);
@@ -108,7 +108,7 @@ export default function HomeScreen() {
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
-      <SearchBar value="" onChangeText={() => {}} />
+      <SearchBar />
       <ThemedText
         type="subtitle"
         lightColor={Colors.light.subtitle}
@@ -116,11 +116,10 @@ export default function HomeScreen() {
       >
         All brands
       </ThemedText>
+
       {brandLoading ? (
         <LoadingSmall />
-      ) : brands === null || brands.length <= 0 ? (
-        <Empty />
-      ) : (
+      ) : brands === null || brands.length <= 0 ? null : (
         <Brands DATA={brands} />
       )}
       <ThemedText
@@ -134,7 +133,12 @@ export default function HomeScreen() {
       {loading ? (
         <LoadingSmall />
       ) : tools == null || tools.length <= 0 ? (
-        <Empty />
+        <Empty
+          icon="frown"
+          description="Shop now is empty! Come back!"
+          title="Empty"
+          noAction
+        />
       ) : (
         <Tools toolData={tools} />
       )}

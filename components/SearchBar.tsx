@@ -6,7 +6,7 @@ import {
   Pressable,
   StyleSheet,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Feather from "@expo/vector-icons/Feather";
 import { ThemedView } from "./ThemedView";
@@ -14,12 +14,32 @@ import { Colors } from "@/constants/Colors";
 
 import "@/styles/styles.css";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { usePathname } from "expo-router";
 type SearchBarProps = {
   value: string;
   onChangeText: (text: string) => void;
 };
-const SearchBar = ({ value, onChangeText }: SearchBarProps) => {
+const SearchBar = () => {
+  const [value, setValue] = useState<string>();
   const theme = useColorScheme() ?? "light";
+  const router = useRouter();
+  const currentPath = usePathname();
+  const { query } = useLocalSearchParams<{ query?: string }>();
+
+  const onChangeText = (text: string) => setValue(text);
+  const handleSearch = () => {
+    if (currentPath !== "/search") {
+      // Only navigate if not already on the search screen
+      router.push({ pathname: "/search", params: { query: value } });
+    }
+  };
+  useEffect(() => {
+    if (query) {
+      setValue(query);
+    }
+  }, [query]);
+
   return (
     <View
       className={`flex flex-row rounded-full border ${
@@ -41,6 +61,7 @@ const SearchBar = ({ value, onChangeText }: SearchBarProps) => {
           },
           styles.pressable,
         ]}
+        onPress={handleSearch}
       >
         <Feather name="search" size={20} color="white" />
       </Pressable>

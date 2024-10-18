@@ -1,27 +1,11 @@
-import { View, Text, Image, StyleSheet, FlatList } from "react-native";
 import React from "react";
-import { ThemedText } from "@/components/ThemedText";
-import CommonBadge from "@/components/atoms/CommonBadge";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import ITool from "@/interface/tool.interface";
 import ToolCard from "@/components/molecules/ToolCard";
 import { ThemedView } from "./ThemedView";
 import { Colors } from "@/constants/Colors";
-import { roundNumber } from "@/utils/roundNumber";
 import { calculatePrice } from "@/utils/calculatePrice";
 import { averageRating } from "@/utils/averageRating";
 
-type IToolCard = {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  oldPrice: number;
-  sale: number;
-  rating: number;
-  numberOfRating: number;
-  deal: number;
-};
 type ToolsProps = {
   toolData: ArrayLike<ITool>;
 };
@@ -71,9 +55,4 @@ const Tools = ({ toolData }: ToolsProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  row: {
-    justifyContent: "space-between",
-  },
-});
 export default Tools;

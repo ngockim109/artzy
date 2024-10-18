@@ -45,7 +45,7 @@ const Filters = () => {
       horizontal
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
-        <View className="relative py-3">
+        <View className="relative py-2">
           <Pressable
             onPress={() => handleSelectFilter(item)}
             style={({ pressed }) => [

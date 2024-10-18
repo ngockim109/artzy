@@ -15,6 +15,7 @@ type ToolsProps = {
   numberOfRating: number;
   oldPrice: number;
   deal: number;
+  noCardWidth?: boolean;
   id: string;
 };
 const ToolCard = ({
@@ -26,9 +27,13 @@ const ToolCard = ({
   oldPrice,
   deal,
   id,
+  noCardWidth = false,
 }: ToolsProps) => {
   return (
-    <View style={styles.card} className="mb-5 rounded-md relative">
+    <View
+      style={[styles.card, !noCardWidth && styles.cardWidth]}
+      className="mb-5 rounded-md relative"
+    >
       <FavoriteIcon
         favorite={false}
         color={Colors.light.highlight}
@@ -104,7 +109,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   card: {
-    width: "48%",
     shadowColor: "rgba(0, 0, 0, 0.24)",
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 3,
@@ -113,6 +117,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingBottom: 10,
     marginVertical: 10,
+  },
+  cardWidth: {
+    width: "48%",
   },
   cardContent: {
     paddingHorizontal: 10,

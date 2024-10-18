@@ -15,7 +15,14 @@ const Brands = ({ DATA }: BrandsProps) => {
       horizontal
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => router.push(`/brands/${item?.brand}`)}>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: `/brands/[id]`,
+              params: { id: item?.brand ?? "", brandImage: item?.brandImage },
+            })
+          }
+        >
           <BrandCard
             src={item?.brandImage}
             key={item?.id}
