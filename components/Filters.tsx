@@ -101,7 +101,6 @@ const Filters = ({ onFilterChange }) => {
     } else if (item?.id === "4") {
       updatedOnSale = updatedOnSale === true ? null : true;
       setOnSale(updatedOnSale);
-      console.log("bug", onSale === true ? null : true);
       let priceFilter =
         price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
       onFilterChange({
@@ -133,14 +132,12 @@ const Filters = ({ onFilterChange }) => {
   };
   const handleGlassSurfaceChange = (value) => {
     setGlassSurface(value);
-    console.log("Selected glass surface:", value);
     bottomSheetModalGlassSurfaceRef.current?.dismiss();
     setIsGlassSurfaceModalVisible(false);
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
     onFilterChange({ price: priceFilter, onSale, glassSurface: value });
   };
-  console.log(minPrice, maxPrice);
   const handlePriceFilter = () => {
     if (
       price === "InRange" &&
@@ -151,7 +148,6 @@ const Filters = ({ onFilterChange }) => {
     }
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
-    console.log(price);
 
     onFilterChange({ price: priceFilter, onSale, glassSurface });
     bottomSheetModalRef.current?.dismiss();

@@ -203,7 +203,12 @@ const ToolDetail = () => {
 
         <ThemedView className="my-3">
           <TouchableOpacity
-            onPress={() => router.push(`/tools/[${toolId}]/feedbacks`)}
+            onPress={() =>
+              router.push({
+                pathname: "/tools/[id]/feedbacks",
+                params: { id: tool?.id },
+              })
+            }
           >
             <ThemedText type="subtitle">Customer Reviews</ThemedText>
           </TouchableOpacity>

@@ -27,7 +27,12 @@ const PreviewFeedback = ({ feedbacks, toolId }: PreviewFeedbackProps) => {
     <ThemedView className="mt-1">
       <ThemedView>
         <TouchableOpacity
-          onPress={() => router.push(`/tools/[${toolId}]/feedbacks`)}
+          onPress={() =>
+            router.push({
+              pathname: "/tools/[id]/feedbacks",
+              params: { id: toolId },
+            })
+          }
         >
           <ThemedView className="flex-row justify-between align-middle items-center">
             <ThemedView>
@@ -53,12 +58,14 @@ const PreviewFeedback = ({ feedbacks, toolId }: PreviewFeedbackProps) => {
         </TouchableOpacity>
       </ThemedView>
       {checkFeedbacksComments(feedbacks) ? (
-        feedbacks?.map((feedback) => (
-          <FeedbackItem
-            feedback={feedback}
-            key={`${feedback?.userId}_${feedback.date}`}
-          />
-        ))
+        feedbacks
+          ?.slice(0, 3)
+          .map((feedback) => (
+            <FeedbackItem
+              feedback={feedback}
+              key={`${feedback?.userId}_${feedback.date}`}
+            />
+          ))
       ) : (
         <ThemedView
           lightColor={Colors.light.grayLight}
@@ -73,7 +80,12 @@ const PreviewFeedback = ({ feedbacks, toolId }: PreviewFeedbackProps) => {
       )}
       {checkFeedbacksComments(feedbacks) && (
         <TouchableOpacity
-          onPress={() => router.push(`/tools/[${toolId}]/feedbacks`)}
+          onPress={() =>
+            router.push({
+              pathname: "/tools/[id]/feedbacks",
+              params: { id: toolId },
+            })
+          }
         >
           <ThemedView
             className="border px-3 py-2 rounded-full mt-3 flex-row justify-center"
