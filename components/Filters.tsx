@@ -27,7 +27,7 @@ import {
 import { ThemedView } from "./ThemedView";
 import { filterTools, isValidPrice } from "@/utils/filterTools";
 
-const Filters = () => {
+const Filters = ({ onFilterChange }) => {
   const theme = useColorScheme() ?? "light";
   const [activeIndex, setActiveIndex] = useState();
   const [price, setPrice] = useState<string>("Any price");
@@ -93,12 +93,22 @@ const Filters = () => {
 
   const handleSelectFilter = (item) => {
     setActiveIndex(item?.id ?? "");
+    let updatedOnSale = onSale;
     if (item?.id === "2") {
       toggleModalVisibility();
     } else if (item?.id === "3") {
       toggleModalGlassSurfaceVisibility();
     } else if (item?.id === "4") {
-      setOnSale((prev) => (prev === true ? null : true));
+      updatedOnSale = updatedOnSale === true ? null : true;
+      setOnSale(updatedOnSale);
+      console.log("bug", onSale === true ? null : true);
+      let priceFilter =
+        price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
+      onFilterChange({
+        price: priceFilter,
+        onSale: updatedOnSale,
+        glassSurface,
+      });
     }
   };
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -126,6 +136,9 @@ const Filters = () => {
     console.log("Selected glass surface:", value);
     bottomSheetModalGlassSurfaceRef.current?.dismiss();
     setIsGlassSurfaceModalVisible(false);
+    let priceFilter =
+      price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
+    onFilterChange({ price: priceFilter, onSale, glassSurface: value });
   };
   console.log(minPrice, maxPrice);
   const handlePriceFilter = () => {
@@ -140,17 +153,7 @@ const Filters = () => {
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
     console.log(price);
 
-    // Call filterTools function with updated filters
-    // const results = filterTools({
-    //   originalTools,
-    //   price: priceFilter,
-    //   glassSurfaces: glassSurface,
-    //   onSale,
-    // });
-
-    // Update the filtered tools state
-    // setFilteredTools(results);
-    // Close the bottom sheet modal after showing results
+    onFilterChange({ price: priceFilter, onSale, glassSurface });
     bottomSheetModalRef.current?.dismiss();
     setIsModalVisible(false);
   };

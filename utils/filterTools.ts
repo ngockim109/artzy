@@ -15,9 +15,15 @@ export const filterTools = ({
   price = "Any price",
   glassSurfaces = "All",
   onSale = null,
-}: FilterToolsProps) => {
+}: FilterToolsProps): ITool[] => {
+  console.log("filterTools:", filterTools);
+  console.log("price", price);
+  console.log("glass:", glassSurfaces);
+  console.log("onSale:", onSale);
+  console.log("price:", price);
   const [minPrice, maxPrice] =
     price !== "Any price" ? price.split("-").map(Number) : [null, null];
+  console.log("bug", minPrice, maxPrice);
   return originalTools.filter((tool) => {
     const isPriceMath =
       price === "Any price" ||

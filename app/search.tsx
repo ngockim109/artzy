@@ -12,13 +12,17 @@ import { Colors } from "@/constants/Colors";
 import { ThemedView } from "@/components/ThemedView";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import SearchBar from "@/components/SearchBar";
+import { filterTools } from "@/utils/filterTools";
+import Filters from "@/components/Filters";
 
 const search = () => {
   const { query } = useLocalSearchParams<{ query?: string }>();
   const [tools, setTools] = useState<ITool[]>([]);
+  const [filteredTools, setFilteredTools] = useState(tools);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState<string>(query || "");
+  const [areFiltersApplied, setAreFiltersApplied] = useState(false);
   const router = useRouter();
 
   const searchTools = async () => {
@@ -45,7 +49,22 @@ const search = () => {
   useEffect(() => {
     searchTools();
   }, [query]);
+  const applyFilters = (filters) => {
+    const filteredResults = filterTools({
+      originalTools: tools,
+      price: filters.price,
+      glassSurfaces: filters.glassSurface,
+      onSale: filters.onSale,
+    });
 
+    setFilteredTools(filteredResults);
+    const isDefaultFilter =
+      filters.price === "Any price" &&
+      filters.glassSurface === "All" &&
+      filters.onSale === null;
+
+    setAreFiltersApplied(!isDefaultFilter);
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "", dark: "" }}
@@ -100,7 +119,7 @@ const search = () => {
             lightColor={Colors.light.subtitle}
             darkColor={Colors.dark.subtitle}
           >
-            All products
+            Products
           </ThemedText>
           {loading ? null : (
             <ThemedText
@@ -109,18 +128,47 @@ const search = () => {
               darkColor={Colors.dark.gray}
               className="text-right"
             >
-              Results: {tools?.length}
-              {tools?.length > 1 ? " products" : " product"}
+              Results:{" "}
+              {areFiltersApplied ? filteredTools?.length : tools?.length}
+              {areFiltersApplied
+                ? tools?.length > 1
+                  ? " products"
+                  : " product"
+                : tools?.length > 1
+                ? " products"
+                : " product"}
             </ThemedText>
           )}
-
+          <Filters onFilterChange={applyFilters} />
           {loading ? (
             <LoadingSmall />
-          ) : tools?.length > 0 ? (
-            <ThemedView>
-              <Tools toolData={tools} />
-            </ThemedView>
-          ) : (
+          ) : areFiltersApplied ? (
+            filteredTools == null || filteredTools.length <= 0 ? (
+              <Empty
+                title="No results found"
+                description="Something went wrong. Please try again!"
+                icon="search1"
+                buttonText="Try again"
+                noAction
+                handlePress={() => {
+                  setErrorText(null);
+                  searchTools();
+                }}
+              />
+            ) : (
+              <>
+                <ThemedText
+                  className="text-right"
+                  type="blurText"
+                  lightColor={Colors.light.gray}
+                  darkColor={Colors.dark.gray}
+                >
+                  Showing {filteredTools.length} data
+                </ThemedText>
+                <Tools toolData={filteredTools} />
+              </>
+            )
+          ) : tools == null || tools.length <= 0 ? (
             <Empty
               title="No results found"
               description="Something went wrong. Please try again!"
@@ -130,7 +178,20 @@ const search = () => {
                 setErrorText(null);
                 searchTools();
               }}
+              noAction
             />
+          ) : (
+            <>
+              <ThemedText
+                className="text-right"
+                type="blurText"
+                lightColor={Colors.light.gray}
+                darkColor={Colors.dark.gray}
+              >
+                Showing all {tools.length} data
+              </ThemedText>
+              <Tools toolData={tools} />
+            </>
           )}
         </>
       )}

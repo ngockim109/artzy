@@ -29,6 +29,7 @@ import LoadingSmall from "@/components/LoadingSmall";
 import { useRouter } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { filterTools } from "@/utils/filterTools";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -37,7 +38,8 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
-  const [filter, setFilter] = useState<string[]>();
+  const [filteredTools, setFilteredTools] = useState(tools);
+  const [areFiltersApplied, setAreFiltersApplied] = useState(false);
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
   const handleSearch = () => {
@@ -77,6 +79,23 @@ export default function HomeScreen() {
   useEffect(() => {
     getArtTools();
   }, []);
+  const applyFilters = (filters) => {
+    const filteredResults = filterTools({
+      originalTools: tools,
+      price: filters.price,
+      glassSurfaces: filters.glassSurface,
+      onSale: filters.onSale,
+    });
+
+    setFilteredTools(filteredResults);
+    const isDefaultFilter =
+      filters.price === "Any price" &&
+      filters.glassSurface === "All" &&
+      filters.onSale === null;
+
+    setAreFiltersApplied(!isDefaultFilter);
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
@@ -107,18 +126,49 @@ export default function HomeScreen() {
       >
         All products
       </ThemedText>
-      <Filters />
+      <Filters onFilterChange={applyFilters} />
       {loading ? (
         <LoadingSmall />
+      ) : areFiltersApplied ? (
+        filteredTools == null || filteredTools.length <= 0 ? (
+          <Empty
+            icon="frown"
+            description="No products here!"
+            title="Empty"
+            noAction
+          />
+        ) : (
+          <>
+            <ThemedText
+              className="text-right"
+              type="blurText"
+              lightColor={Colors.light.gray}
+              darkColor={Colors.dark.gray}
+            >
+              Showing {filteredTools.length} data
+            </ThemedText>
+            <Tools toolData={filteredTools} />
+          </>
+        )
       ) : tools == null || tools.length <= 0 ? (
         <Empty
           icon="frown"
-          description="Shop now is empty! Come back!"
+          description="No products here!"
           title="Empty"
           noAction
         />
       ) : (
-        <Tools toolData={tools} />
+        <>
+          <ThemedText
+            className="text-right"
+            type="blurText"
+            lightColor={Colors.light.gray}
+            darkColor={Colors.dark.gray}
+          >
+            Showing all {tools.length} data
+          </ThemedText>
+          <Tools toolData={tools} />
+        </>
       )}
     </ParallaxScrollView>
   );
