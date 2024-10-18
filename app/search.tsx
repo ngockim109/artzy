@@ -39,7 +39,7 @@ const search = () => {
   };
   const onChangeSearchValue = (text: string) => setSearchValue(text);
   const handleSearch = () => {
-    router.replace({ pathname: "/search", params: { query: searchValue } });
+    router.setParams({ query: searchValue });
   };
 
   useEffect(() => {
@@ -91,6 +91,7 @@ const search = () => {
             setErrorText(null);
             searchTools();
           }}
+          noAction
         />
       ) : (
         <>
