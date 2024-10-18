@@ -26,6 +26,7 @@ import Empty from "@/components/Empty";
 import IBrand from "@/interface/brand.interface";
 import Loading from "@/components/Loading";
 import LoadingSmall from "@/components/LoadingSmall";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -33,44 +34,14 @@ export default function HomeScreen() {
   const [brandLoading, setBrandLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
-  const DATA = [
-    {
-      id: "1",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-    {
-      id: "2",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-    {
-      id: "3",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-    {
-      id: "4",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-    {
-      id: "5",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-    {
-      id: "6",
-      brand: "jdgfjhd",
-      brandImage:
-        "https://i.pinimg.com/236x/1f/3b/53/1f3b53271bae57b57230e9061ede1191.jpg",
-    },
-  ];
+  const [searchValue, setSearchValue] = useState<string>("");
+  const router = useRouter();
+  const onChangeSearchValue = (text: string) => setSearchValue(text);
+  const handleSearch = () => {
+    // Only navigate if not already on the search screen
+    router.push({ pathname: "/search", params: { query: searchValue } });
+    setSearchValue("");
+  };
 
   const getArtTools = async () => {
     try {
@@ -108,7 +79,11 @@ export default function HomeScreen() {
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
-      <SearchBar />
+      <SearchBar
+        value={searchValue}
+        onChangeText={onChangeSearchValue}
+        handleSearch={handleSearch}
+      />
       <ThemedText
         type="subtitle"
         lightColor={Colors.light.subtitle}

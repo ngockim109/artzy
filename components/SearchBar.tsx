@@ -19,20 +19,12 @@ import { usePathname } from "expo-router";
 type SearchBarProps = {
   value: string;
   onChangeText: (text: string) => void;
+  handleSearch: () => void;
 };
-const SearchBar = () => {
-  const [value, setValue] = useState<string>();
+const SearchBar = ({ value, onChangeText, handleSearch }: SearchBarProps) => {
   const theme = useColorScheme() ?? "light";
   const router = useRouter();
   const currentPath = usePathname();
-
-  const onChangeText = (text: string) => setValue(text);
-  const handleSearch = () => {
-    if (currentPath !== "/search") {
-      // Only navigate if not already on the search screen
-      router.push({ pathname: "/search", params: { query: value } });
-    }
-  };
 
   return (
     <View

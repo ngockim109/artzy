@@ -18,12 +18,14 @@ const search = () => {
   const [tools, setTools] = useState<ITool[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState<string>(query || "");
   const router = useRouter();
 
   const searchTools = async () => {
     try {
       setLoading(true);
       setErrorText(null);
+      setTools([]);
       const artNameRs = await api.get("/art-tools?artName=" + query);
       if (artNameRs.status === 200) {
         setTools(artNameRs.data);
@@ -31,9 +33,13 @@ const search = () => {
       }
     } catch (error) {
       if (error.status === 404) {
-        setErrorText("No products found!");
+        setErrorText("No products found! Please search other keywords!");
       }
     }
+  };
+  const onChangeSearchValue = (text: string) => setSearchValue(text);
+  const handleSearch = () => {
+    router.replace({ pathname: "/search", params: { query: searchValue } });
   };
 
   useEffect(() => {
@@ -65,7 +71,11 @@ const search = () => {
                 />
               </TouchableOpacity>
               <ThemedView style={{ width: "80%", marginLeft: 10 }}>
-                <SearchBar />
+                <SearchBar
+                  value={searchValue}
+                  handleSearch={handleSearch}
+                  onChangeText={onChangeSearchValue}
+                />
               </ThemedView>
             </>
           ),
