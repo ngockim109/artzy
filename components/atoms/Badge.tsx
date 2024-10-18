@@ -4,7 +4,7 @@ import { ThemedText } from "../ThemedText";
 import "@/styles/styles.css";
 
 type BadgeProps = {
-  text: string;
+  text: number;
   darkColor: string;
   borderColor: string;
   textDarkColor: string;

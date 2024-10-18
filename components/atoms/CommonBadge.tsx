@@ -18,6 +18,9 @@ const CommonBadge = ({ text, status }: CommonBadgeProps) => {
     case "glassSurface":
       color = "#2A9D8F";
       break;
+    case "noGlassSurface":
+      color = "#717b7a";
+      break;
     case "information":
       color = "#0000FF";
       break;
@@ -33,7 +36,7 @@ const CommonBadge = ({ text, status }: CommonBadgeProps) => {
   }
   return (
     <View className="p-1 rounded-full px-2" style={{ backgroundColor: color }}>
-      <Text className={`text-xs ${textColor}`}>{text}</Text>
+      <Text className={`text-xs ${textColor} text-center`}>{text}</Text>
     </View>
   );
 };

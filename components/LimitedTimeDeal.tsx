@@ -29,6 +29,7 @@ const LimitedTimeDealProducts = ({ toolData }: ToolsProps) => {
             key={item?.id}
             id={item?.id}
             noCardWidth={true}
+            glassSurface={item?.glassSurface}
           />
         </ThemedView>
       )}

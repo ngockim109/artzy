@@ -27,6 +27,8 @@ import IBrand from "@/interface/brand.interface";
 import Loading from "@/components/Loading";
 import LoadingSmall from "@/components/LoadingSmall";
 import { useRouter } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -35,6 +37,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
+  const [filter, setFilter] = useState<string[]>();
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
   const handleSearch = () => {

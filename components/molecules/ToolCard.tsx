@@ -15,6 +15,7 @@ type ToolsProps = {
   numberOfRating: number;
   oldPrice: number;
   deal: number;
+  glassSurface: boolean;
   noCardWidth?: boolean;
   id: string;
 };
@@ -27,6 +28,7 @@ const ToolCard = ({
   oldPrice,
   deal,
   id,
+  glassSurface,
   noCardWidth = false,
 }: ToolsProps) => {
   return (
@@ -94,6 +96,12 @@ const ToolCard = ({
                   </ThemedText>
                 </View>
               )}
+            </View>
+            <View className="w-28 my-1">
+              <CommonBadge
+                text={`${glassSurface ? "Glass Surface" : "No Glass Surface"}`}
+                status={`${glassSurface ? "glassSurface" : "noGlassSurface"}`}
+              />
             </View>
           </View>
         </View>

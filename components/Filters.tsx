@@ -1,21 +1,50 @@
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
+import BottomSheet, {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 import "@/styles/styles.css";
 import Badge from "./atoms/Badge";
+import {
+  GestureHandlerRootView,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
+import { ThemedView } from "./ThemedView";
+import { filterTools, isValidPrice } from "@/utils/filterTools";
 
 const Filters = () => {
   const theme = useColorScheme() ?? "light";
   const [activeIndex, setActiveIndex] = useState();
+  const [price, setPrice] = useState<string>("Any price");
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+  const [glassSurface, setGlassSurface] = useState<string>("All");
+  const [onSale, setOnSale] = useState<boolean | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isGlassSurfaceModalVisible, setIsGlassSurfaceModalVisible] =
+    useState<boolean>(false);
+  const bottomSheetModalGlassSurfaceRef = useRef<BottomSheetModal>(null);
+
   const DATA = [
     {
       id: "1",
       text: "Filter",
-      icon: "caretdown",
+      icon: "indent-right",
     },
     {
       id: "2",
@@ -24,89 +53,344 @@ const Filters = () => {
     },
     {
       id: "3",
-      text: "GlassSurface",
+      text: "Glass Surface",
       icon: "caretdown",
     },
     {
       id: "4",
       text: "On sale",
-      icon: "caretdown",
+      icon: "tags",
     },
   ];
-
-  const handleSelectFilter = (item) => {
-    setActiveIndex(item?.id ?? -1);
-    console.log("Selected filter:", item);
+  const snapPoints = useMemo(() => ["30%"], []);
+  const toggleModalVisibility = () => {
+    if (isModalVisible) {
+      bottomSheetModalRef.current?.dismiss(); // Close modal if it's visible
+    } else {
+      bottomSheetModalRef.current?.present(); // Open modal if it's not visible
+    }
+    setIsModalVisible(!isModalVisible); // Toggle the state
+  };
+  const toggleModalGlassSurfaceVisibility = () => {
+    if (isGlassSurfaceModalVisible) {
+      bottomSheetModalGlassSurfaceRef.current?.dismiss(); // Close modal if it's visible
+    } else {
+      bottomSheetModalGlassSurfaceRef.current?.present(); // Open modal if it's not visible
+    }
+    setIsGlassSurfaceModalVisible(!isGlassSurfaceModalVisible); // Toggle the state
+  };
+  const handleModalDismiss = () => {
+    bottomSheetModalRef.current?.dismiss();
+    if (minPrice === "" || maxPrice === "") {
+      setPrice("Any price");
+    }
+    setMinPrice("");
+    setMaxPrice("");
+    setIsModalVisible(false);
+  };
+  const handleModalGlassSurfaceDismiss = () => {
+    bottomSheetModalGlassSurfaceRef.current?.dismiss();
+    setIsGlassSurfaceModalVisible(false);
   };
 
+  const handleSelectFilter = (item) => {
+    setActiveIndex(item?.id ?? "");
+    if (item?.id === "2") {
+      toggleModalVisibility();
+    } else if (item?.id === "3") {
+      toggleModalGlassSurfaceVisibility();
+    } else if (item?.id === "4") {
+      setOnSale((prev) => (prev === true ? null : true));
+    }
+  };
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // callbacks
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+  const handleSheetGlassSurfaceChanges = useCallback((index: number) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handlePriceChange = (value) => {
+    setPrice(value);
+    if (value !== "InRange") {
+      setMinPrice("");
+      setMaxPrice("");
+    }
+  };
+  const handleGlassSurfaceChange = (value) => {
+    setGlassSurface(value);
+    console.log("Selected glass surface:", value);
+    bottomSheetModalGlassSurfaceRef.current?.dismiss();
+    setIsGlassSurfaceModalVisible(false);
+  };
+  console.log(minPrice, maxPrice);
+  const handlePriceFilter = () => {
+    if (
+      price === "InRange" &&
+      (!isValidPrice(minPrice) || !isValidPrice(maxPrice))
+    ) {
+      alert("Please enter valid numbers for min and max prices.");
+      return;
+    }
+    let priceFilter =
+      price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
+    console.log(price);
+
+    // Call filterTools function with updated filters
+    // const results = filterTools({
+    //   originalTools,
+    //   price: priceFilter,
+    //   glassSurfaces: glassSurface,
+    //   onSale,
+    // });
+
+    // Update the filtered tools state
+    // setFilteredTools(results);
+    // Close the bottom sheet modal after showing results
+    bottomSheetModalRef.current?.dismiss();
+    setIsModalVisible(false);
+  };
   return (
-    <FlatList
-      data={DATA}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      renderItem={({ item }) => (
-        <View className="relative py-2">
-          <Pressable
-            onPress={() => handleSelectFilter(item)}
-            style={({ pressed }) => [
-              styles.pressable,
-              {
-                opacity: pressed ? 0.7 : 1,
-                backgroundColor:
-                  activeIndex === item?.id
-                    ? theme === "light"
-                      ? Colors.light.primary
-                      : Colors.dark.primary
-                    : "white",
-                borderColor:
-                  activeIndex === item?.id
-                    ? theme === "light"
-                      ? Colors.light.secondary
-                      : Colors.dark.secondary
-                    : theme === "light"
-                    ? Colors.light.search
-                    : Colors.dark.search,
-              },
-            ]}
-          >
-            <ThemedText
-              lightColor={
-                activeIndex === item?.id
-                  ? "white"
-                  : Colors.light.buttonOutlineText
-              }
-              darkColor={
-                activeIndex === item?.id
-                  ? "white"
-                  : Colors.dark.buttonOutlineText
-              }
+    <>
+      <FlatList
+        data={DATA}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => {
+          const appliedFiltersCount = [
+            price !== "Any price" ? 1 : 0,
+            glassSurface !== "All" ? 1 : 0,
+            onSale !== null ? 1 : 0,
+          ].reduce((acc, cur) => acc + cur, 0);
+          return (
+            <View className="relative py-2">
+              <Pressable
+                onPress={() => handleSelectFilter(item)}
+                style={({ pressed }) => [
+                  styles.pressable,
+                  {
+                    opacity: pressed ? 0.7 : 1,
+                    backgroundColor:
+                      (item?.text === "Price" && price !== "Any price") ||
+                      (item?.text === "On sale" && onSale !== null) ||
+                      (item?.text === "Glass Surface" &&
+                        glassSurface !== "All") ||
+                      (item?.text === "Filter" && appliedFiltersCount > 0)
+                        ? theme === "light"
+                          ? Colors.light.primary
+                          : Colors.dark.primary
+                        : "white",
+                    borderColor:
+                      (item?.text === "Price" && price !== "Any price") ||
+                      (item?.text === "On sale" && onSale !== null) ||
+                      (item?.text === "Glass Surface" &&
+                        glassSurface !== "All") ||
+                      (item?.text === "Filter" && appliedFiltersCount > 0)
+                        ? theme === "light"
+                          ? Colors.light.secondary
+                          : Colors.dark.secondary
+                        : theme === "light"
+                        ? Colors.light.search
+                        : Colors.dark.search,
+                  },
+                ]}
+              >
+                <ThemedText
+                  lightColor={
+                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === "On sale" && onSale !== null) ||
+                    (item?.text === "Glass Surface" &&
+                      glassSurface !== "All") ||
+                    (item?.text === "Filter" && appliedFiltersCount > 0)
+                      ? "white"
+                      : Colors.light.buttonOutlineText
+                  }
+                  darkColor={
+                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === "On sale" && onSale !== null) ||
+                    (item?.text === "Glass Surface" &&
+                      glassSurface !== "All") ||
+                    (item?.text === "Filter" && appliedFiltersCount > 0)
+                      ? "white"
+                      : Colors.dark.buttonOutlineText
+                  }
+                >
+                  {item?.text}
+                </ThemedText>
+                <AntDesign
+                  name={item?.icon}
+                  size={14}
+                  color={
+                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === "On sale" && onSale !== null) ||
+                    (item?.text === "Glass Surface" &&
+                      glassSurface !== "All") ||
+                    (item?.text === "Filter" && appliedFiltersCount > 0)
+                      ? "white"
+                      : theme === "light"
+                      ? Colors.light.icon
+                      : Colors.dark.icon
+                  }
+                />
+              </Pressable>
+              {item?.text === "Filter" && appliedFiltersCount > 0 ? (
+                <Badge
+                  lightColor={Colors.light.badge}
+                  darkColor={Colors.dark.badge}
+                  borderColor={Colors.light.primary}
+                  textDarkColor={Colors.dark.badgeText}
+                  textLightColor={Colors.light.badgeText}
+                  text={appliedFiltersCount}
+                />
+              ) : null}
+            </View>
+          );
+        }}
+        keyExtractor={(item) => item?.id}
+      />
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        onDismiss={handleModalDismiss}
+      >
+        <TouchableWithoutFeedback onPress={handleModalDismiss}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+        <BottomSheetView style={styles.contentContainer}>
+          <ThemedText type="subtitle" className="mb-2">
+            Price
+          </ThemedText>
+          <ThemedView>
+            <TouchableOpacity onPress={() => handlePriceChange("Any price")}>
+              <ThemedView className="flex-row gap-2 items-center ">
+                <View
+                  style={[
+                    styles.radio,
+                    price === "Any price" && styles.radioSelected,
+                  ]}
+                />
+                <ThemedText>Any price</ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+          <ThemedView className="flex-row gap-2 mt-2">
+            <TouchableOpacity onPress={() => handlePriceChange("InRange")}>
+              <ThemedView className="flex-row gap-2 items-center ">
+                <View
+                  style={[
+                    styles.radio,
+                    price === "InRange" && styles.radioSelected,
+                  ]}
+                />
+                <ThemedText>In range</ThemedText>
+              </ThemedView>
+              <ThemedView className="flex-row gap-5 justify-between items-center w-full mt-3">
+                <TextInput
+                  placeholder="Min Price"
+                  keyboardType="numeric"
+                  value={minPrice}
+                  onChangeText={(text) => setMinPrice(text)}
+                  editable={price === "InRange"}
+                  style={
+                    price === "InRange"
+                      ? styles.inputEnabled
+                      : styles.inputDisabled
+                  }
+                />
+                <ThemedView style={styles.separator}></ThemedView>
+                <TextInput
+                  placeholder="Max Price"
+                  value={maxPrice}
+                  onChangeText={(text) => setMaxPrice(text)}
+                  editable={price === "InRange"}
+                  style={
+                    price === "InRange"
+                      ? styles.inputEnabled
+                      : styles.inputDisabled
+                  }
+                />
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+          <TouchableOpacity onPress={handlePriceFilter}>
+            <ThemedView
+              lightColor={Colors.light.primary}
+              darkColor={Colors.dark.primary}
+              className="w-full rounded-full p-2 mt-3"
             >
-              {item?.text}
-            </ThemedText>
-            <AntDesign
-              name={item?.icon}
-              size={14}
-              color={
-                activeIndex === item?.id
-                  ? "white"
-                  : theme === "light"
-                  ? Colors.light.icon
-                  : Colors.dark.icon
-              }
-            />
-          </Pressable>
-          <Badge
-            lightColor={Colors.light.badge}
-            darkColor={Colors.dark.badge}
-            borderColor={Colors.light.primary}
-            textDarkColor={Colors.dark.badgeText}
-            textLightColor={Colors.light.badgeText}
-            text="1"
-          />
-        </View>
-      )}
-      keyExtractor={(item) => item?.id}
-    />
+              <ThemedText
+                type="defaultSemiBold"
+                lightColor={Colors.light.buttonPrimaryText}
+                darkColor={Colors.dark.buttonPrimaryText}
+                className="text-center"
+              >
+                Show results
+              </ThemedText>
+            </ThemedView>
+          </TouchableOpacity>
+        </BottomSheetView>
+      </BottomSheetModal>
+      <BottomSheetModal
+        ref={bottomSheetModalGlassSurfaceRef}
+        index={0}
+        snapPoints={snapPoints}
+        onChange={handleSheetGlassSurfaceChanges}
+        onDismiss={handleModalGlassSurfaceDismiss}
+      >
+        <TouchableWithoutFeedback onPress={handleModalGlassSurfaceDismiss}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+        <BottomSheetView style={styles.contentContainer}>
+          <ThemedText type="subtitle" className="mb-2">
+            GlassSurface
+          </ThemedText>
+          <ThemedView>
+            <TouchableOpacity onPress={() => handleGlassSurfaceChange("All")}>
+              <ThemedView className="flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+                <ThemedText
+                  lightColor={Colors.light.primary}
+                  darkColor={Colors.dark.primary}
+                >
+                  All
+                </ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+          <ThemedView>
+            <TouchableOpacity onPress={() => handleGlassSurfaceChange("true")}>
+              <ThemedView className="my-2 flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+                <ThemedText
+                  lightColor={Colors.light.primary}
+                  darkColor={Colors.dark.primary}
+                >
+                  Glass Surface
+                </ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+          <ThemedView>
+            <TouchableOpacity onPress={() => handleGlassSurfaceChange("false")}>
+              <ThemedView className="flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+                <ThemedText
+                  lightColor={Colors.light.primary}
+                  darkColor={Colors.dark.primary}
+                >
+                  No Glass Surface
+                </ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+        </BottomSheetView>
+      </BottomSheetModal>
+    </>
   );
 };
 
@@ -123,6 +407,54 @@ const styles = StyleSheet.create({
     overflow: "visible",
     marginRight: 15,
     zIndex: 10,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+  },
+  inputEnabled: {
+    width: "41%",
+    borderColor: Colors.light.primary,
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: "#fff",
+  },
+  inputDisabled: {
+    width: "41%",
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: "#f2f2f2",
+  },
+  radio: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.light.primary,
+  },
+  radioSelected: {
+    backgroundColor: Colors.light.primary,
+  },
+  separator: {
+    height: 1,
+    width: 15,
+    backgroundColor: Colors.light.primary,
+    marginHorizontal: 10,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    zIndex: 1,
   },
 });
 

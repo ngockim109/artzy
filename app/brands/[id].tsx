@@ -7,7 +7,6 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import ITool from "@/interface/tool.interface";
 import api from "@/api/api";
 import { Colors } from "@/constants/Colors";
-import ToolCard from "@/components/molecules/ToolCard";
 import LoadingSmall from "@/components/LoadingSmall";
 import Empty from "@/components/Empty";
 import Tools from "@/components/Tools";

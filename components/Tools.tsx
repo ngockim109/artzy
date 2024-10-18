@@ -48,6 +48,7 @@ const Tools = ({ toolData }: ToolsProps) => {
             toolName={item?.artName}
             key={item?.id}
             id={item?.id}
+            glassSurface={item?.glassSurface}
           />
         );
       })}
