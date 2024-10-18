@@ -25,7 +25,6 @@ const SearchBar = () => {
   const theme = useColorScheme() ?? "light";
   const router = useRouter();
   const currentPath = usePathname();
-  const { query } = useLocalSearchParams<{ query?: string }>();
 
   const onChangeText = (text: string) => setValue(text);
   const handleSearch = () => {
@@ -34,11 +33,6 @@ const SearchBar = () => {
       router.push({ pathname: "/search", params: { query: value } });
     }
   };
-  useEffect(() => {
-    if (query) {
-      setValue(query);
-    }
-  }, [query]);
 
   return (
     <View

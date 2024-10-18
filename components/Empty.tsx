@@ -22,7 +22,7 @@ const Empty = ({
   noAction = false,
 }: EmptyProps) => {
   return (
-    <View>
+    <View className="items-center justify-center">
       <AntDesign name={icon} color={Colors.light.gray} size={30} />
       <ThemedText type="defaultSemiBold">{title}</ThemedText>
       <ThemedText>{description}</ThemedText>
