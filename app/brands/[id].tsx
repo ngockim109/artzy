@@ -51,7 +51,7 @@ const Brands = () => {
     >
       <Stack.Screen
         options={{
-          headerTransparent: true,
+          headerTransparent: false,
           headerTitle: "",
           headerLeft: () => (
             <>
@@ -93,8 +93,8 @@ const Brands = () => {
         }}
       ></Stack.Screen>
 
-      {loadingDeal ? null : (
-        <ThemedView className="mt-28">
+      {loadingDeal ? null : toolsDeal && toolsDeal?.length > 0 ? (
+        <ThemedView>
           <ThemedText
             type="subtitle"
             lightColor={Colors.light.primary}
@@ -104,12 +104,12 @@ const Brands = () => {
           </ThemedText>
           <LimitedTimeDealProducts toolData={toolsDeal} />
         </ThemedView>
-      )}
+      ) : null}
 
       {loading ? (
         <LoadingSmall />
       ) : tools?.length > 0 ? (
-        <ThemedView className="mt-3">
+        <ThemedView>
           <ThemedText
             type="subtitle"
             lightColor={Colors.light.primary}
@@ -123,7 +123,13 @@ const Brands = () => {
           <Tools toolData={tools} />
         </ThemedView>
       ) : (
-        <Empty />
+        <Empty
+          description="Brand has no product! Come back later!"
+          icon="frown"
+          title="No products!"
+          buttonText="Go home"
+          handlePress={() => router.replace("/")}
+        />
       )}
     </ParallaxScrollView>
   );

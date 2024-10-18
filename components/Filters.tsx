@@ -84,8 +84,6 @@ const Filters = () => {
     if (minPrice === "" || maxPrice === "") {
       setPrice("Any price");
     }
-    setMinPrice("");
-    setMaxPrice("");
     setIsModalVisible(false);
   };
   const handleModalGlassSurfaceDismiss = () => {
@@ -354,10 +352,30 @@ const Filters = () => {
           </ThemedText>
           <ThemedView>
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("All")}>
-              <ThemedView className="flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+              <ThemedView
+                className="flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"
+                lightColor={
+                  glassSurface === "All"
+                    ? Colors.light.primary
+                    : Colors.light.background
+                }
+                darkColor={
+                  glassSurface === "All"
+                    ? Colors.dark.primary
+                    : Colors.dark.background
+                }
+              >
                 <ThemedText
-                  lightColor={Colors.light.primary}
-                  darkColor={Colors.dark.primary}
+                  lightColor={
+                    glassSurface === "All"
+                      ? Colors.light.buttonPrimaryText
+                      : Colors.light.primary
+                  }
+                  darkColor={
+                    glassSurface === "All"
+                      ? Colors.dark.buttonPrimaryText
+                      : Colors.dark.primary
+                  }
                 >
                   All
                 </ThemedText>
@@ -366,10 +384,30 @@ const Filters = () => {
           </ThemedView>
           <ThemedView>
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("true")}>
-              <ThemedView className="my-2 flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+              <ThemedView
+                className="my-2 flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"
+                lightColor={
+                  glassSurface === "true"
+                    ? Colors.light.primary
+                    : Colors.light.background
+                }
+                darkColor={
+                  glassSurface === "true"
+                    ? Colors.dark.primary
+                    : Colors.dark.background
+                }
+              >
                 <ThemedText
-                  lightColor={Colors.light.primary}
-                  darkColor={Colors.dark.primary}
+                  lightColor={
+                    glassSurface === "true"
+                      ? Colors.light.buttonPrimaryText
+                      : Colors.light.primary
+                  }
+                  darkColor={
+                    glassSurface === "true"
+                      ? Colors.dark.buttonPrimaryText
+                      : Colors.dark.primary
+                  }
                 >
                   Glass Surface
                 </ThemedText>
@@ -378,10 +416,30 @@ const Filters = () => {
           </ThemedView>
           <ThemedView>
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("false")}>
-              <ThemedView className="flex-row gap-2 items-center p-2 w-full rounded-sm border border-primary">
+              <ThemedView
+                className="flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"
+                lightColor={
+                  glassSurface === "false"
+                    ? Colors.light.primary
+                    : Colors.light.background
+                }
+                darkColor={
+                  glassSurface === "false"
+                    ? Colors.dark.primary
+                    : Colors.dark.background
+                }
+              >
                 <ThemedText
-                  lightColor={Colors.light.primary}
-                  darkColor={Colors.dark.primary}
+                  lightColor={
+                    glassSurface === "false"
+                      ? Colors.light.buttonPrimaryText
+                      : Colors.light.primary
+                  }
+                  darkColor={
+                    glassSurface === "false"
+                      ? Colors.dark.buttonPrimaryText
+                      : Colors.dark.primary
+                  }
                 >
                   No Glass Surface
                 </ThemedText>

@@ -17,7 +17,7 @@ const LimitedTimeDealProducts = ({ toolData }: ToolsProps) => {
       horizontal
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
-        <ThemedView style={{ width: 180, marginRight: 8 }}>
+        <ThemedView style={{ width: 190, marginRight: 8 }}>
           <ToolCard
             deal={item?.limitedTimeDeal}
             numberOfRating={item?.feedbacks?.length ?? 0}
