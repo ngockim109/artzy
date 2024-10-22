@@ -28,6 +28,7 @@ import {
 } from "react-native-gesture-handler";
 import { ThemedView } from "./ThemedView";
 import { filterTools, isValidPrice } from "@/utils/filterTools";
+import { useFocusEffect } from "expo-router";
 
 const Filters = ({ onFilterChange }) => {
   const theme = useColorScheme() ?? "light";
@@ -153,9 +154,6 @@ const Filters = ({ onFilterChange }) => {
     console.log("handleSheetChanges", index);
   }, []);
 
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
   const handlePriceChange = (value) => {
     setPrice(value);
 
@@ -212,6 +210,20 @@ const Filters = ({ onFilterChange }) => {
     bottomSheetModalRef.current?.close();
     setIsModalVisible(false);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      // Reset all filter states when the screen is focused
+      setPrice("Any price");
+      setPriceText("Price");
+      setMinPrice("");
+      setMaxPrice("");
+      setGlassSurface("All");
+      setGlassSurfaceText("Categories");
+      setOnSale(null);
+    }, [])
+  );
+
   return (
     <>
       <FlatList

@@ -1,11 +1,15 @@
-import { View, Image, StyleSheet, Pressable } from "react-native";
-import React from "react";
+import { View, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import CommonBadge from "@/components/atoms/CommonBadge";
 import { Colors } from "@/constants/Colors";
 import FavoriteIcon from "../atoms/FavoriteIcon";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Alert } from "react-native";
+import { useNotification } from "../atoms/NotificationContext";
 
 type ToolsProps = {
   source: string;
@@ -31,109 +35,160 @@ const ToolCard = ({
   glassSurface,
   noCardWidth = false,
 }: ToolsProps) => {
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const { showNotification } = useNotification();
+  useEffect(() => {
+    loadFavorite();
+  }, []);
+  const loadFavorite = async () => {
+    try {
+      const favoriteItems = await AsyncStorage.getItem("favorites");
+      if (favoriteItems) {
+        const favoriteItemsArray = JSON.parse(favoriteItems);
+        setIsFavorite(favoriteItemsArray.includes(id));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFavoritePress = async () => {
+    try {
+      const favorites = await AsyncStorage.getItem("favorites");
+      let updatedFavorites = favorites ? JSON.parse(favorites) : [];
+
+      if (isFavorite) {
+        // Remove from favorites
+        updatedFavorites = updatedFavorites.filter(
+          (item: string) => item !== id
+        );
+        showNotification(`Item removed successfully from favorites!`);
+      } else {
+        // Add to favorites
+        updatedFavorites.push(id);
+        showNotification(`Item added successfully to favorites!`);
+      }
+
+      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <View
-      style={[styles.card, !noCardWidth && styles.cardWidth]}
-      className="mb-5 rounded-md relative"
-    >
-      <FavoriteIcon
-        favorite={false}
-        color={Colors.light.highlight}
-        style={{ backgroundColor: Colors.light.grayLight }}
-        className="absolute right-1 top-1 rounded-full p-2"
-      />
-      <Pressable
-        onPress={() =>
-          router.push({
-            pathname: "/tools/[id]",
-            params: { id: id },
-          })
-        }
+    <>
+      <View
+        style={[styles.card, !noCardWidth && styles.cardWidth]}
+        className="mb-5 rounded-md z-10"
+        pointerEvents="box-none"
       >
-        <View>
-          <Image
-            style={styles.image}
-            source={{ uri: source }}
-            resizeMode="contain"
+        <View style={styles.favoriteContainer}>
+          <FavoriteIcon
+            favorite={isFavorite}
+            color={Colors.light.highlight}
+            style={{ backgroundColor: Colors.light.grayLight }}
+            className="absolute right-1 top-1 rounded-full p-2 w-9 h-9"
+            onPress={handleFavoritePress}
           />
-          <View style={styles.cardContent}>
-            <ThemedText
-              lightColor={Colors.light.textCard}
-              darkColor={Colors.dark.textCard}
-            >
-              {toolName}
-            </ThemedText>
-            <View className="flex-row">
+        </View>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "/tools/[id]",
+              params: { id: id },
+            })
+          }
+        >
+          <View>
+            <Image
+              style={styles.image}
+              source={{ uri: source }}
+              resizeMode="contain"
+            />
+
+            <View style={styles.cardContent}>
               <ThemedText
-                type="subtext"
                 lightColor={Colors.light.textCard}
                 darkColor={Colors.dark.textCard}
+                numberOfLines={2}
               >
-                {rating}
+                {toolName}
               </ThemedText>
-              <StarRatingDisplay
-                rating={rating}
-                starSize={16}
-                style={{ alignItems: "center" }}
-                starStyle={{ marginRight: 0, marginLeft: 0 }}
-              />
-              <ThemedText
-                className="text-slate-300"
-                type="subtext"
-                lightColor={Colors.light.textCard}
-                darkColor={Colors.dark.textCard}
-              >
-                ({numberOfRating})
-              </ThemedText>
-            </View>
-            {deal > 0 && (
-              <View className="w-28 my-1">
-                <CommonBadge text="Limited time deal" status="highlight" />
-              </View>
-            )}
-            <View className="flex-row justify-between">
-              <View className="flex-row ">
+              <View className="flex-row">
                 <ThemedText
-                  type="subtitle"
+                  type="subtext"
                   lightColor={Colors.light.textCard}
                   darkColor={Colors.dark.textCard}
                 >
-                  ${price}
+                  {rating}
                 </ThemedText>
-                {deal > 0 && (
+                <StarRatingDisplay
+                  rating={rating}
+                  starSize={16}
+                  style={{ alignItems: "center" }}
+                  starStyle={{ marginRight: 0, marginLeft: 0 }}
+                />
+                <ThemedText
+                  className="text-slate-300"
+                  type="subtext"
+                  lightColor={Colors.light.textCard}
+                  darkColor={Colors.dark.textCard}
+                >
+                  ({numberOfRating})
+                </ThemedText>
+              </View>
+              {deal > 0 && (
+                <View className="w-28 my-1">
+                  <CommonBadge text="Limited time deal" status="highlight" />
+                </View>
+              )}
+              <View className="flex-row justify-between">
+                <View className="flex-row ">
                   <ThemedText
-                    type="remove"
-                    className="ml-2"
+                    type="subtitle"
                     lightColor={Colors.light.textCard}
                     darkColor={Colors.dark.textCard}
                   >
-                    ${oldPrice}
+                    ${price}
                   </ThemedText>
+                  {deal > 0 && (
+                    <ThemedText
+                      type="remove"
+                      className="ml-2"
+                      lightColor={Colors.light.textCard}
+                      darkColor={Colors.dark.textCard}
+                    >
+                      ${oldPrice}
+                    </ThemedText>
+                  )}
+                </View>
+
+                {deal > 0 && (
+                  <View>
+                    <ThemedText
+                      type="highlight"
+                      lightColor={Colors.light.highlight}
+                      darkColor={Colors.dark.highlight}
+                    >
+                      -{deal * 100}%
+                    </ThemedText>
+                  </View>
                 )}
               </View>
-
-              {deal > 0 && (
-                <View>
-                  <ThemedText
-                    type="highlight"
-                    lightColor={Colors.light.highlight}
-                    darkColor={Colors.dark.highlight}
-                  >
-                    -{deal * 100}%
-                  </ThemedText>
-                </View>
-              )}
-            </View>
-            <View className="w-28 my-1">
-              <CommonBadge
-                text={`${glassSurface ? "Glass Surface" : "No Glass Surface"}`}
-                status={`${glassSurface ? "glassSurface" : "noGlassSurface"}`}
-              />
+              <View className="w-28 my-1">
+                <CommonBadge
+                  text={`${
+                    glassSurface ? "Glass Surface" : "No Glass Surface"
+                  }`}
+                  status={`${glassSurface ? "glassSurface" : "noGlassSurface"}`}
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </Pressable>
-    </View>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
 
@@ -158,6 +213,24 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     paddingHorizontal: 10,
+  },
+  notification: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    padding: 15,
+    backgroundColor: Colors.light.highlight,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    margin: 10,
+  },
+  notificationLink: {
+    color: "white",
+    marginTop: 5,
+  },
+  favoriteContainer: {
+    zIndex: 100,
   },
 });
 export default ToolCard;

@@ -19,13 +19,13 @@ import Filters from "@/components/Filters";
 
 import "@/styles/styles.css";
 import api from "@/api/api";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ITool from "@/interface/tool.interface";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
 import IBrand from "@/interface/brand.interface";
 import LoadingSmall from "@/components/LoadingSmall";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { filterTools } from "@/utils/filterTools";
 import SortTools from "@/components/SortTools";
 import { sortTools } from "@/utils/sortData";
@@ -163,7 +163,22 @@ export default function HomeScreen() {
       }
     }
   };
+  const resetFiltersAndSorting = () => {
+    setPriceFilter("Any price");
+    setGlassSurfaceFilter("All");
+    setOnSaleFilter(null);
+    setCurrentSortOption("relevant");
+    setAreFiltersApplied(false);
+    setAreSortApplied(false);
+    setTools(originalTools); // Reset to the original list
+  };
 
+  // Use useFocusEffect to reset filters and sorting when the screen gains focus
+  useFocusEffect(
+    useCallback(() => {
+      resetFiltersAndSorting(); // Reset state on focus
+    }, [originalTools]) // Only reset when the original tools are loaded
+  );
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}

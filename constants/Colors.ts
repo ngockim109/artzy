@@ -22,6 +22,8 @@ const buttonPrimaryText = "#fff";
 const buttonPrimaryTextDark = "#fff";
 const yellow = "#E9C46A";
 const bottomSheetBg = "#fff";
+const blackColor = "#000";
+const whiteColor = "#fff";
 
 export const Colors = {
   light: {
@@ -50,6 +52,7 @@ export const Colors = {
     buttonPrimaryText: buttonPrimaryText,
     ratingBar: yellow,
     bottomSheetBg: bottomSheetBg,
+    white: whiteColor,
   },
   dark: {
     primary: primaryColor,
@@ -57,6 +60,7 @@ export const Colors = {
     grayLight: grayLightDark,
     gray: grayDark,
     slate: slate,
+    white: blackColor,
     text: "#fff",
     textCard: "#000",
     textSearchBar: grayDark,

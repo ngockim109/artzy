@@ -14,6 +14,7 @@ import "@/styles/styles.css";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { ThemedView } from "./ThemedView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useFocusEffect } from "expo-router";
 
 const SortTools = ({ onSortChange }) => {
   const theme = useColorScheme() ?? "light";
@@ -83,7 +84,13 @@ const SortTools = ({ onSortChange }) => {
     { id: "highestAvgReview", name: "Highest Avg Review" },
     { id: "lowestAvgReview", name: "Lowest Avg Review" },
   ];
-
+  useFocusEffect(
+    useCallback(() => {
+      // Reset all filter states when the screen is focused
+      setIsSort(false);
+      setSortText("Sort");
+    }, [])
+  );
   return (
     <>
       <ThemedView className="py-2 flex-row justify-end">
