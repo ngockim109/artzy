@@ -128,6 +128,19 @@ const Filters = ({ onFilterChange }) => {
         onSale: updatedOnSale,
         glassSurface,
       });
+    } else if (item?.id === "1") {
+      setPrice("Any price");
+      setPriceText("Price");
+      setMinPrice("");
+      setMaxPrice("");
+      setGlassSurface("All");
+      setGlassSurfaceText("Categories");
+      setOnSale(null);
+      onFilterChange({
+        price: "Any price",
+        onSale: null,
+        glassSurface: "All",
+      });
     }
   };
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -219,6 +232,12 @@ const Filters = ({ onFilterChange }) => {
                   styles.pressable,
                   {
                     opacity: pressed ? 0.7 : 1,
+                    display:
+                      item?.text !== "Filter"
+                        ? "flex"
+                        : item?.text === "Filter" && appliedFiltersCount > 0
+                        ? "flex"
+                        : "none",
                     backgroundColor:
                       (item?.text === priceText && price !== "Any price") ||
                       (item?.text === "On sale" && onSale !== null) ||
@@ -264,7 +283,7 @@ const Filters = ({ onFilterChange }) => {
                       : Colors.dark.buttonOutlineText
                   }
                 >
-                  {item?.text}
+                  {item?.text !== "Filter" ? item?.text : "Clear All"}
                 </ThemedText>
                 <AntDesign
                   name={item?.icon}

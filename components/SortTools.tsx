@@ -140,14 +140,34 @@ const SortTools = ({ onSortChange }) => {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <BottomSheetView style={styles.contentContainer}>
-          <ThemedText
-            type="subtitle"
-            className="mb-2"
-            lightColor={Colors.light.textCard}
-            darkColor={Colors.dark.textCard}
+          <ThemedView
+            className="flex-row justify-between"
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
           >
-            Sort by
-          </ThemedText>
+            <ThemedText
+              type="subtitle"
+              className="mb-2"
+              lightColor={Colors.light.textCard}
+              darkColor={Colors.dark.textCard}
+            >
+              Sort by
+            </ThemedText>
+            {isSort ? (
+              <TouchableOpacity
+                onPress={() => handleSortFieldChange("relevant", "Relevant")}
+              >
+                <ThemedText
+                  type="defaultSemiBold"
+                  className="mb-2"
+                  lightColor={Colors.light.link}
+                  darkColor={Colors.dark.link}
+                >
+                  Reset
+                </ThemedText>
+              </TouchableOpacity>
+            ) : null}
+          </ThemedView>
           {sortFieldData?.map((item) => (
             <TouchableOpacity
               key={item?.id}
