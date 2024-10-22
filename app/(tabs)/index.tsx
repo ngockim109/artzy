@@ -44,6 +44,10 @@ export default function HomeScreen() {
   const [currentSortOption, setCurrentSortOption] =
     useState<string>("relevant");
 
+  const [priceFilter, setPriceFilter] = useState<string>("Any price");
+  const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<string>("All");
+  const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
+
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
   const handleSearch = () => {
@@ -86,11 +90,15 @@ export default function HomeScreen() {
   }, []);
   const applyFilters = (filters) => {
     const filteredResults = filterTools({
-      originalTools: tools,
+      originalTools: originalTools,
       price: filters.price,
       glassSurfaces: filters.glassSurface,
       onSale: filters.onSale,
     });
+
+    setPriceFilter(filters.price);
+    setGlassSurfaceFilter(filters.glassSurface);
+    setOnSaleFilter(filters.onSale);
 
     const isDefaultFilter =
       filters.price === "Any price" &&
@@ -99,14 +107,29 @@ export default function HomeScreen() {
 
     setAreFiltersApplied(!isDefaultFilter);
     console.log(areSortApplied + "sort");
+    if (isDefaultFilter) {
+      setPriceFilter("Any price");
+      setGlassSurfaceFilter("All");
+      setOnSaleFilter(null);
+    }
     if (areSortApplied) {
-      const sortedFilteredResults = sortTools(
-        filteredResults,
-        currentSortOption
-      ); // currentSortOption stores the selected sorting option
-      setFilteredTools(sortedFilteredResults);
+      if (isDefaultFilter) {
+        const filteredResults = filterTools({
+          originalTools: originalTools,
+          price: "Any price",
+          glassSurfaces: "All",
+          onSale: null,
+        });
+        setFilteredTools(filteredResults);
+      } else {
+        const sortedFilteredResults = sortTools(
+          filteredResults,
+          currentSortOption
+        );
+        setFilteredTools(sortedFilteredResults);
+      }
     } else {
-      setFilteredTools(filteredResults); // Only filter, no sort
+      setFilteredTools(filteredResults);
     }
   };
 
@@ -116,9 +139,14 @@ export default function HomeScreen() {
       setAreSortApplied(false);
 
       // Reset tools to original data
-
+      const filteredResults = filterTools({
+        originalTools: originalTools,
+        price: priceFilter,
+        glassSurfaces: glassSurfaceFilter,
+        onSale: onSaleFilter,
+      });
       if (areFiltersApplied) {
-        setFilteredTools(filteredTools);
+        setFilteredTools(filteredResults);
       } else {
         setTools(originalTools);
       }

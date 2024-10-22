@@ -32,7 +32,7 @@ export const Colors = {
     slate: slate,
     text: "#11181C",
     textCard: "#11181C",
-    textSearchBar: grayLight,
+    textSearchBar: "#000",
     buttonOutlineText: primaryColor,
     badge: secondaryColor,
     search: primaryColor,
