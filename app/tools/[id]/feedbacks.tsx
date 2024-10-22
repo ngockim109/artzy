@@ -18,12 +18,14 @@ import {
   percentageOfRatingByStar,
 } from "@/utils/averageRating";
 import RatingBar from "@/components/atoms/RatingBar";
+import FilterStar from "@/components/templates/FilterStar";
 
 const feedbacks = () => {
   const { id } = useLocalSearchParams();
   const [tool, setTool] = useState<ITool | null>(null);
   const [avgRating, setAvgRating] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [filteredFeedbacks, setFilteredFeedbacks] = useState<IFeedback[]>([]);
 
   const router = useRouter();
 
@@ -35,12 +37,28 @@ const feedbacks = () => {
         setTool(response.data);
         setLoading(false);
         setAvgRating(averageRating(response?.data?.feedbacks));
+        setFilteredFeedbacks(response.data.feedbacks);
       }
     } catch (error) {
       console.error(error);
     }
   };
   console.log(id);
+
+  const applyFilter = (selectedId: string) => {
+    if (selectedId === "All") {
+      // Show all feedbacks if "All" is selected
+      setFilteredFeedbacks(tool?.feedbacks ?? []);
+    } else {
+      // Filter feedbacks by the selected star rating
+      const filtered = (tool?.feedbacks ?? []).filter(
+        (feedback) => feedback.rating === Number(selectedId)
+      );
+      console.log(filtered);
+      setFilteredFeedbacks(filtered);
+    }
+  };
+
   useEffect(() => {
     getTool();
   }, [id]);
@@ -100,22 +118,29 @@ const feedbacks = () => {
           )}
 
           {Array.from({ length: 5 }, (_, index) => (
-            <ThemedView className="flex-row gap-2 items-center mt-2">
-              <ThemedText style={{ width: 70 }}>
-                {index + 1} star{index + 1 <= 1 ? "" : "s"}
+            <ThemedView
+              key={5 - index}
+              className="flex-row gap-1 items-center mt-2"
+            >
+              <ThemedText style={{ width: 60 }}>
+                {5 - index} star{5 - index === 1 ? "" : "s"}
               </ThemedText>
               <RatingBar
                 allRating={tool?.feedbacks?.length ?? 0}
                 numberOfRating={countRatingByStar(
                   tool?.feedbacks ?? [],
-                  index + 1
+                  5 - index
                 )}
               />
             </ThemedView>
           ))}
 
-          {checkFeedbacksComments(tool?.feedbacks ?? []) ? (
-            tool?.feedbacks.map((feedback) => (
+          <FilterStar
+            onFilterChange={applyFilter}
+            feedbacks={tool?.feedbacks ?? []}
+          />
+          {checkFeedbacksComments(filteredFeedbacks ?? []) ? (
+            filteredFeedbacks.map((feedback) => (
               <FeedbackItem
                 feedback={feedback}
                 key={`${feedback?.userId}_${feedback.date}`}

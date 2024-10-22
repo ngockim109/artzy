@@ -13,8 +13,7 @@ const RatingBar = ({ allRating, numberOfRating }: RatingBarProps) => {
 
   // Set color based on percentage
   const getColor = (percentage: number) => {
-    if (percentage > 75) return Colors.light.primary;
-    return "#e0e0e0";
+    return Colors.light.ratingBar;
   };
 
   const [progress] = useState(new Animated.Value(0));
@@ -44,7 +43,7 @@ const RatingBar = ({ allRating, numberOfRating }: RatingBarProps) => {
         />
       </View>
       <ThemedText style={styles.percentageText}>
-        {Math.round(percentage)}%
+        {Math.round(percentage)}% ({numberOfRating})
       </ThemedText>
     </View>
   );
@@ -53,13 +52,12 @@ const RatingBar = ({ allRating, numberOfRating }: RatingBarProps) => {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    marginVertical: 10,
     flex: 1,
     flexDirection: "row",
-    gap: 5,
+    gap: 3,
   },
   progressContainer: {
-    width: "80%",
+    width: "70%",
     height: 10,
     backgroundColor: "#e0e0e0",
     borderRadius: 5,

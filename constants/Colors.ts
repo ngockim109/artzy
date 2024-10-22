@@ -20,6 +20,7 @@ const slateDark = "rgb(229 231 235)";
 const grayDark = "rgb(107 114 128)";
 const buttonPrimaryText = "#fff";
 const buttonPrimaryTextDark = "#fff";
+const yellow = "#E9C46A";
 
 export const Colors = {
   light: {
@@ -44,6 +45,7 @@ export const Colors = {
     tabIconDefault: primaryColor,
     tabIconSelected: tintColorLight,
     buttonPrimaryText: buttonPrimaryText,
+    ratingBar: yellow,
   },
   dark: {
     primary: primaryColor,
@@ -67,5 +69,6 @@ export const Colors = {
     tabIconDefault: primaryColorDark,
     tabIconSelected: tintColorDark,
     buttonPrimaryText: buttonPrimaryTextDark,
+    ratingBar: yellow,
   },
 };
