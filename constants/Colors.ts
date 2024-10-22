@@ -21,6 +21,7 @@ const grayDark = "rgb(107 114 128)";
 const buttonPrimaryText = "#fff";
 const buttonPrimaryTextDark = "#fff";
 const yellow = "#E9C46A";
+const bottomSheetBg = "#fff";
 
 export const Colors = {
   light: {
@@ -30,6 +31,8 @@ export const Colors = {
     gray: gray,
     slate: slate,
     text: "#11181C",
+    textCard: "#11181C",
+    textSearchBar: grayLight,
     buttonOutlineText: primaryColor,
     badge: secondaryColor,
     search: primaryColor,
@@ -46,6 +49,7 @@ export const Colors = {
     tabIconSelected: tintColorLight,
     buttonPrimaryText: buttonPrimaryText,
     ratingBar: yellow,
+    bottomSheetBg: bottomSheetBg,
   },
   dark: {
     primary: primaryColor,
@@ -53,10 +57,12 @@ export const Colors = {
     grayLight: grayLightDark,
     gray: grayDark,
     slate: slate,
-    text: "#ECEDEE",
+    text: "#fff",
+    textCard: "#000",
+    textSearchBar: grayDark,
     buttonOutlineText: primaryColorDark,
     badge: secondaryColorDark,
-    search: primaryColorDark,
+    search: secondaryColorDark,
     highlight: highlightColor,
     badgeText: "#000",
     title: primaryColorDark,
@@ -70,5 +76,6 @@ export const Colors = {
     tabIconSelected: tintColorDark,
     buttonPrimaryText: buttonPrimaryTextDark,
     ratingBar: yellow,
+    bottomSheetBg: bottomSheetBg,
   },
 };

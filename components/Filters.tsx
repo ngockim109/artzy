@@ -309,34 +309,68 @@ const Filters = ({ onFilterChange }) => {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <BottomSheetView style={styles.contentContainer}>
-          <ThemedText type="subtitle" className="mb-2">
+          <ThemedText
+            type="subtitle"
+            className="mb-2"
+            lightColor={Colors.light.textCard}
+            darkColor={Colors.dark.textCard}
+          >
             Price
           </ThemedText>
-          <ThemedView>
+          <ThemedView
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
             <TouchableOpacity onPress={() => handlePriceChange("Any price")}>
-              <ThemedView className="flex-row gap-2 items-center ">
+              <ThemedView
+                className="flex-row gap-2 items-center "
+                darkColor={Colors.dark.bottomSheetBg}
+                lightColor={Colors.light.bottomSheetBg}
+              >
                 <View
                   style={[
                     styles.radio,
                     price === "Any price" && styles.radioSelected,
                   ]}
                 />
-                <ThemedText>Any price</ThemedText>
+                <ThemedText
+                  lightColor={Colors.light.textCard}
+                  darkColor={Colors.dark.textCard}
+                >
+                  Any price
+                </ThemedText>
               </ThemedView>
             </TouchableOpacity>
           </ThemedView>
-          <ThemedView className="flex-row gap-2 mt-2">
+          <ThemedView
+            className="flex-row gap-2 mt-2"
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
             <TouchableOpacity onPress={() => handlePriceChange("InRange")}>
-              <ThemedView className="flex-row gap-2 items-center ">
+              <ThemedView
+                className="flex-row gap-2 items-center "
+                darkColor={Colors.dark.bottomSheetBg}
+                lightColor={Colors.light.bottomSheetBg}
+              >
                 <View
                   style={[
                     styles.radio,
                     price === "InRange" && styles.radioSelected,
                   ]}
                 />
-                <ThemedText>In range</ThemedText>
+                <ThemedText
+                  lightColor={Colors.light.textCard}
+                  darkColor={Colors.dark.textCard}
+                >
+                  In range
+                </ThemedText>
               </ThemedView>
-              <ThemedView className="flex-row gap-5 justify-between items-center w-full mt-3">
+              <ThemedView
+                darkColor={Colors.dark.bottomSheetBg}
+                lightColor={Colors.light.bottomSheetBg}
+                className="flex-row gap-5 justify-between items-center w-full mt-3"
+              >
                 <TextInput
                   placeholder="Min Price"
                   keyboardType="numeric"
@@ -394,10 +428,18 @@ const Filters = ({ onFilterChange }) => {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <BottomSheetView style={styles.contentContainer}>
-          <ThemedText type="subtitle" className="mb-2">
+          <ThemedText
+            type="subtitle"
+            className="mb-2"
+            lightColor={Colors.light.textCard}
+            darkColor={Colors.dark.textCard}
+          >
             GlassSurface
           </ThemedText>
-          <ThemedView>
+          <ThemedView
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("All")}>
               <ThemedView
                 className="flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"
@@ -429,7 +471,10 @@ const Filters = ({ onFilterChange }) => {
               </ThemedView>
             </TouchableOpacity>
           </ThemedView>
-          <ThemedView>
+          <ThemedView
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("true")}>
               <ThemedView
                 className="my-2 flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"
@@ -461,7 +506,10 @@ const Filters = ({ onFilterChange }) => {
               </ThemedView>
             </TouchableOpacity>
           </ThemedView>
-          <ThemedView>
+          <ThemedView
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
             <TouchableOpacity onPress={() => handleGlassSurfaceChange("false")}>
               <ThemedView
                 className="flex-row gap-2 items-center p-2 w-full rounded-md border border-primary"

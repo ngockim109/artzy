@@ -57,16 +57,32 @@ const ToolCard = ({
             resizeMode="contain"
           />
           <View style={styles.cardContent}>
-            <ThemedText>{toolName}</ThemedText>
+            <ThemedText
+              lightColor={Colors.light.textCard}
+              darkColor={Colors.dark.textCard}
+            >
+              {toolName}
+            </ThemedText>
             <View className="flex-row">
-              <ThemedText type="subtext">{rating}</ThemedText>
+              <ThemedText
+                type="subtext"
+                lightColor={Colors.light.textCard}
+                darkColor={Colors.dark.textCard}
+              >
+                {rating}
+              </ThemedText>
               <StarRatingDisplay
                 rating={rating}
                 starSize={16}
                 style={{ alignItems: "center" }}
                 starStyle={{ marginRight: 0, marginLeft: 0 }}
               />
-              <ThemedText className="text-slate-300" type="subtext">
+              <ThemedText
+                className="text-slate-300"
+                type="subtext"
+                lightColor={Colors.light.textCard}
+                darkColor={Colors.dark.textCard}
+              >
                 ({numberOfRating})
               </ThemedText>
             </View>
@@ -77,9 +93,20 @@ const ToolCard = ({
             )}
             <View className="flex-row justify-between">
               <View className="flex-row ">
-                <ThemedText type="subtitle">${price}</ThemedText>
+                <ThemedText
+                  type="subtitle"
+                  lightColor={Colors.light.textCard}
+                  darkColor={Colors.dark.textCard}
+                >
+                  ${price}
+                </ThemedText>
                 {deal > 0 && (
-                  <ThemedText type="remove" className="ml-2">
+                  <ThemedText
+                    type="remove"
+                    className="ml-2"
+                    lightColor={Colors.light.textCard}
+                    darkColor={Colors.dark.textCard}
+                  >
                     ${oldPrice}
                   </ThemedText>
                 )}

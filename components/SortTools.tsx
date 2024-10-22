@@ -86,7 +86,7 @@ const SortTools = ({ onSortChange }) => {
 
   return (
     <>
-      <View className="w-16 py-2">
+      <ThemedView className="py-2 flex-row justify-end">
         <Pressable
           onPress={() => handleSelectFilter()}
           style={({ pressed }) => [
@@ -126,7 +126,7 @@ const SortTools = ({ onSortChange }) => {
             }
           />
         </Pressable>
-      </View>
+      </ThemedView>
 
       <BottomSheetModal
         ref={bottomSheetModalSortRef}
@@ -140,7 +140,12 @@ const SortTools = ({ onSortChange }) => {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <BottomSheetView style={styles.contentContainer}>
-          <ThemedText type="subtitle" className="mb-2">
+          <ThemedText
+            type="subtitle"
+            className="mb-2"
+            lightColor={Colors.light.textCard}
+            darkColor={Colors.dark.textCard}
+          >
             Sort by
           </ThemedText>
           {sortFieldData?.map((item) => (
@@ -148,7 +153,11 @@ const SortTools = ({ onSortChange }) => {
               key={item?.id}
               onPress={() => handleSortFieldChange(item?.id, item?.name)}
             >
-              <ThemedView className="flex-row gap-2 items-center py-3">
+              <ThemedView
+                className="flex-row gap-2 items-center py-3"
+                darkColor={Colors.dark.bottomSheetBg}
+                lightColor={Colors.light.bottomSheetBg}
+              >
                 <View
                   style={[
                     styles.radio,
@@ -159,11 +168,13 @@ const SortTools = ({ onSortChange }) => {
                 <ThemedText
                   lightColor={
                     sortField === item?.id
-                      ? Colors.light.text
-                      : Colors.light.text
+                      ? Colors.light.textCard
+                      : Colors.light.textCard
                   }
                   darkColor={
-                    sortField === item?.id ? Colors.dark.text : Colors.dark.text
+                    sortField === item?.id
+                      ? Colors.dark.textCard
+                      : Colors.dark.textCard
                   }
                 >
                   {item?.name}
