@@ -152,10 +152,7 @@ const feedbacks = () => {
               darkColor={Colors.dark.grayLight}
               className="py-3 px-3"
             >
-              <ThemedText>
-                There are 0 customer reviews and {tool?.feedbacks?.length}{" "}
-                customer ratings.
-              </ThemedText>
+              <ThemedText>There are 0 reviews.</ThemedText>
             </ThemedView>
           )}
         </ThemedView>

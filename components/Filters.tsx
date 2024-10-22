@@ -13,6 +13,8 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "./ThemedText";
 import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetModalProvider,
   BottomSheetView,
@@ -31,9 +33,12 @@ const Filters = ({ onFilterChange }) => {
   const theme = useColorScheme() ?? "light";
   const [activeIndex, setActiveIndex] = useState();
   const [price, setPrice] = useState<string>("Any price");
+  const [priceText, setPriceText] = useState<string>("Price");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [glassSurface, setGlassSurface] = useState<string>("All");
+  const [glassSurfaceText, setGlassSurfaceText] =
+    useState<string>("Categories");
   const [onSale, setOnSale] = useState<boolean | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isGlassSurfaceModalVisible, setIsGlassSurfaceModalVisible] =
@@ -48,12 +53,12 @@ const Filters = ({ onFilterChange }) => {
     },
     {
       id: "2",
-      text: "Price",
+      text: priceText,
       icon: "caretdown",
     },
     {
       id: "3",
-      text: "Glass Surface",
+      text: glassSurfaceText,
       icon: "caretdown",
     },
     {
@@ -65,7 +70,7 @@ const Filters = ({ onFilterChange }) => {
   const snapPoints = useMemo(() => ["30%"], []);
   const toggleModalVisibility = () => {
     if (isModalVisible) {
-      bottomSheetModalRef.current?.dismiss(); // Close modal if it's visible
+      bottomSheetModalRef.current?.close(); // Close modal if it's visible
     } else {
       bottomSheetModalRef.current?.present(); // Open modal if it's not visible
     }
@@ -73,21 +78,36 @@ const Filters = ({ onFilterChange }) => {
   };
   const toggleModalGlassSurfaceVisibility = () => {
     if (isGlassSurfaceModalVisible) {
-      bottomSheetModalGlassSurfaceRef.current?.dismiss(); // Close modal if it's visible
+      bottomSheetModalGlassSurfaceRef.current?.close(); // Close modal if it's visible
     } else {
       bottomSheetModalGlassSurfaceRef.current?.present(); // Open modal if it's not visible
     }
     setIsGlassSurfaceModalVisible(!isGlassSurfaceModalVisible); // Toggle the state
   };
+
+  const renderBackdrop = React.useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.9}
+        onPress={() => bottomSheetModalRef.current?.close()}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
   const handleModalDismiss = () => {
-    bottomSheetModalRef.current?.dismiss();
-    if (minPrice === "" || maxPrice === "") {
+    bottomSheetModalRef.current?.close();
+    if (minPrice === "" && maxPrice === "") {
       setPrice("Any price");
+      setPriceText("Price");
     }
     setIsModalVisible(false);
   };
   const handleModalGlassSurfaceDismiss = () => {
-    bottomSheetModalGlassSurfaceRef.current?.dismiss();
+    bottomSheetModalGlassSurfaceRef.current?.close();
     setIsGlassSurfaceModalVisible(false);
   };
 
@@ -125,14 +145,16 @@ const Filters = ({ onFilterChange }) => {
   }, []);
   const handlePriceChange = (value) => {
     setPrice(value);
+
     if (value !== "InRange") {
+      setPriceText("Price");
       setMinPrice("");
       setMaxPrice("");
     }
   };
   const handleGlassSurfaceChange = (value) => {
     setGlassSurface(value);
-    bottomSheetModalGlassSurfaceRef.current?.dismiss();
+    bottomSheetModalGlassSurfaceRef.current?.close();
     setIsGlassSurfaceModalVisible(false);
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
@@ -141,16 +163,32 @@ const Filters = ({ onFilterChange }) => {
   const handlePriceFilter = () => {
     if (
       price === "InRange" &&
-      (!isValidPrice(minPrice) || !isValidPrice(maxPrice))
+      !isValidPrice(minPrice) &&
+      !isValidPrice(maxPrice)
     ) {
       alert("Please enter valid numbers for min and max prices.");
       return;
     }
+
+    if (price === "InRange" && parseFloat(maxPrice) <= parseFloat(minPrice)) {
+      alert("Max price cannot be less than or equal min price.");
+      return;
+    }
+    console.log(minPrice);
+    console.log(maxPrice);
+    if (minPrice === "") {
+      setPriceText(`Any to $${maxPrice}`);
+    } else if (maxPrice === "") {
+      setPriceText(`$${minPrice} to any`);
+    } else {
+      setPriceText(`$${minPrice}-$${maxPrice}`);
+    }
+
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
 
     onFilterChange({ price: priceFilter, onSale, glassSurface });
-    bottomSheetModalRef.current?.dismiss();
+    bottomSheetModalRef.current?.close();
     setIsModalVisible(false);
   };
   return (
@@ -174,9 +212,9 @@ const Filters = ({ onFilterChange }) => {
                   {
                     opacity: pressed ? 0.7 : 1,
                     backgroundColor:
-                      (item?.text === "Price" && price !== "Any price") ||
+                      (item?.text === priceText && price !== "Any price") ||
                       (item?.text === "On sale" && onSale !== null) ||
-                      (item?.text === "Glass Surface" &&
+                      (item?.text === glassSurfaceText &&
                         glassSurface !== "All") ||
                       (item?.text === "Filter" && appliedFiltersCount > 0)
                         ? theme === "light"
@@ -184,9 +222,9 @@ const Filters = ({ onFilterChange }) => {
                           : Colors.dark.primary
                         : "white",
                     borderColor:
-                      (item?.text === "Price" && price !== "Any price") ||
+                      (item?.text === priceText && price !== "Any price") ||
                       (item?.text === "On sale" && onSale !== null) ||
-                      (item?.text === "Glass Surface" &&
+                      (item?.text === glassSurfaceText &&
                         glassSurface !== "All") ||
                       (item?.text === "Filter" && appliedFiltersCount > 0)
                         ? theme === "light"
@@ -200,18 +238,18 @@ const Filters = ({ onFilterChange }) => {
               >
                 <ThemedText
                   lightColor={
-                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === priceText && price !== "Any price") ||
                     (item?.text === "On sale" && onSale !== null) ||
-                    (item?.text === "Glass Surface" &&
+                    (item?.text === glassSurfaceText &&
                       glassSurface !== "All") ||
                     (item?.text === "Filter" && appliedFiltersCount > 0)
                       ? "white"
                       : Colors.light.buttonOutlineText
                   }
                   darkColor={
-                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === priceText && price !== "Any price") ||
                     (item?.text === "On sale" && onSale !== null) ||
-                    (item?.text === "Glass Surface" &&
+                    (item?.text === glassSurfaceText &&
                       glassSurface !== "All") ||
                     (item?.text === "Filter" && appliedFiltersCount > 0)
                       ? "white"
@@ -224,9 +262,9 @@ const Filters = ({ onFilterChange }) => {
                   name={item?.icon}
                   size={14}
                   color={
-                    (item?.text === "Price" && price !== "Any price") ||
+                    (item?.text === priceText && price !== "Any price") ||
                     (item?.text === "On sale" && onSale !== null) ||
-                    (item?.text === "Glass Surface" &&
+                    (item?.text === glassSurfaceText &&
                       glassSurface !== "All") ||
                     (item?.text === "Filter" && appliedFiltersCount > 0)
                       ? "white"
@@ -257,6 +295,7 @@ const Filters = ({ onFilterChange }) => {
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={handleModalDismiss}
+        backdropComponent={renderBackdrop}
       >
         <TouchableWithoutFeedback onPress={handleModalDismiss}>
           <View style={styles.overlay} />
@@ -341,6 +380,7 @@ const Filters = ({ onFilterChange }) => {
         snapPoints={snapPoints}
         onChange={handleSheetGlassSurfaceChanges}
         onDismiss={handleModalGlassSurfaceDismiss}
+        backdropComponent={renderBackdrop}
       >
         <TouchableWithoutFeedback onPress={handleModalGlassSurfaceDismiss}>
           <View style={styles.overlay} />

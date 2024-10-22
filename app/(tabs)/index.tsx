@@ -24,11 +24,8 @@ import ITool from "@/interface/tool.interface";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
 import IBrand from "@/interface/brand.interface";
-import Loading from "@/components/Loading";
 import LoadingSmall from "@/components/LoadingSmall";
 import { useRouter } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { filterTools } from "@/utils/filterTools";
 
 export default function HomeScreen() {
