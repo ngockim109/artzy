@@ -54,7 +54,6 @@ const FilterStar = ({ onFilterChange, feedbacks }: FilterStarProps) => {
   const handleSelectFilter = (item) => {
     setActiveIndex(item?.id ?? "");
     onFilterChange(item?.id);
-    console.log(activeIndex);
   };
 
   return (

@@ -23,7 +23,6 @@ export const filterTools = ({
           .split("-")
           .map((val) => (val.trim() !== "" ? parseFloat(val) : null))
       : [null, null];
-  console.log(minPrice + "min", maxPrice + "max", "price" + price);
   return originalTools.filter((tool) => {
     const isPriceMatch =
       price === "Any price" || // If the price is "Any price", skip filtering

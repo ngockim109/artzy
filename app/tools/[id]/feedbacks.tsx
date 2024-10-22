@@ -43,7 +43,6 @@ const feedbacks = () => {
       console.error(error);
     }
   };
-  console.log(id);
 
   const applyFilter = (selectedId: string) => {
     if (selectedId === "All") {
@@ -54,7 +53,6 @@ const feedbacks = () => {
       const filtered = (tool?.feedbacks ?? []).filter(
         (feedback) => feedback.rating === Number(selectedId)
       );
-      console.log(filtered);
       setFilteredFeedbacks(filtered);
     }
   };

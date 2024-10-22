@@ -27,9 +27,12 @@ import IBrand from "@/interface/brand.interface";
 import LoadingSmall from "@/components/LoadingSmall";
 import { useRouter } from "expo-router";
 import { filterTools } from "@/utils/filterTools";
+import SortTools from "@/components/SortTools";
+import { sortTools } from "@/utils/sortData";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
+  const [originalTools, setOriginalTools] = useState<ITool[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [brandLoading, setBrandLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,6 +40,10 @@ export default function HomeScreen() {
   const [searchValue, setSearchValue] = useState<string>("");
   const [filteredTools, setFilteredTools] = useState(tools);
   const [areFiltersApplied, setAreFiltersApplied] = useState(false);
+  const [areSortApplied, setAreSortApplied] = useState(false);
+  const [currentSortOption, setCurrentSortOption] =
+    useState<string>("relevant");
+
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
   const handleSearch = () => {
@@ -52,6 +59,7 @@ export default function HomeScreen() {
       const response = await api.get("art-tools");
       if (response.status == 200) {
         setTools(response.data);
+        setOriginalTools(response.data);
         setLoading(false);
         const brandData = response.data.map((data) => ({
           id: data.brand,
@@ -84,13 +92,48 @@ export default function HomeScreen() {
       onSale: filters.onSale,
     });
 
-    setFilteredTools(filteredResults);
     const isDefaultFilter =
       filters.price === "Any price" &&
       filters.glassSurface === "All" &&
       filters.onSale === null;
 
     setAreFiltersApplied(!isDefaultFilter);
+    console.log(areSortApplied + "sort");
+    if (areSortApplied) {
+      const sortedFilteredResults = sortTools(
+        filteredResults,
+        currentSortOption
+      ); // currentSortOption stores the selected sorting option
+      setFilteredTools(sortedFilteredResults);
+    } else {
+      setFilteredTools(filteredResults); // Only filter, no sort
+    }
+  };
+
+  const handleSortChange = (sortOption) => {
+    setCurrentSortOption(sortOption);
+    if (sortOption === "relevant") {
+      setAreSortApplied(false);
+
+      // Reset tools to original data
+
+      if (areFiltersApplied) {
+        setFilteredTools(filteredTools);
+      } else {
+        setTools(originalTools);
+      }
+    } else {
+      setAreSortApplied(true);
+
+      const toolsToSort = areFiltersApplied ? filteredTools : tools;
+      const sortedTools = sortTools(toolsToSort, sortOption);
+      console.log(areFiltersApplied);
+      if (areFiltersApplied) {
+        setFilteredTools(sortedTools);
+      } else {
+        setTools(sortedTools);
+      }
+    }
   };
 
   return (
@@ -124,6 +167,7 @@ export default function HomeScreen() {
         All products
       </ThemedText>
       <Filters onFilterChange={applyFilters} />
+      <SortTools onSortChange={handleSortChange} />
       {loading ? (
         <LoadingSmall />
       ) : areFiltersApplied ? (
