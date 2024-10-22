@@ -154,6 +154,14 @@ const Filters = ({ onFilterChange }) => {
   };
   const handleGlassSurfaceChange = (value) => {
     setGlassSurface(value);
+    if (value === "true") {
+      setGlassSurfaceText("Glass Surface");
+    } else if (value === "false") {
+      setGlassSurfaceText("No Glass Surface");
+    } else {
+      setGlassSurfaceText("Categories");
+    }
+
     bottomSheetModalGlassSurfaceRef.current?.close();
     setIsGlassSurfaceModalVisible(false);
     let priceFilter =
