@@ -31,6 +31,7 @@ import SortTools from "@/components/SortTools";
 import { sortTools } from "@/utils/sortData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
+import SearchBarNotPage from "@/components/SearchBarNotPage";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -55,10 +56,14 @@ export default function HomeScreen() {
 
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
+  const clearSearchValue = () => setSearchValue("");
   const handleSearch = () => {
-    // Only navigate if not already on the search screen
-    router.push({ pathname: "/search", params: { query: searchValue } });
-    setSearchValue("");
+    // Apply search by toolName in the current tools list
+    const searchResults = originalTools.filter((tool) =>
+      tool.artName.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredTools(searchResults);
+    setAreFiltersApplied(searchValue.length > 0);
   };
 
   const getArtTools = async () => {
@@ -199,11 +204,12 @@ export default function HomeScreen() {
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
-      <View className="mt-3">
-        <SearchBar
+      <View className="mt-3" style={{ position: "relative", zIndex: 100 }}>
+        <SearchBarNotPage
           value={searchValue}
           onChangeText={onChangeSearchValue}
           handleSearch={handleSearch}
+          clearSearchValue={clearSearchValue}
         />
       </View>
       <ThemedText

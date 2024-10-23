@@ -121,24 +121,7 @@ const search = () => {
           >
             Products
           </ThemedText>
-          {loading ? null : (
-            <ThemedText
-              type="blurText"
-              lightColor={Colors.light.gray}
-              darkColor={Colors.dark.gray}
-              className="text-right"
-            >
-              Results:{" "}
-              {areFiltersApplied ? filteredTools?.length : tools?.length}
-              {areFiltersApplied
-                ? tools?.length > 1
-                  ? " products"
-                  : " product"
-                : tools?.length > 1
-                ? " products"
-                : " product"}
-            </ThemedText>
-          )}
+
           <Filters onFilterChange={applyFilters} />
           {loading ? (
             <LoadingSmall />
