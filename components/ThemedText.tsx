@@ -15,6 +15,7 @@ export type ThemedTextProps = TextProps & {
     | "highlight"
     | "remove"
     | "blurText"
+    | "large"
     | "subtext";
 };
 
@@ -40,6 +41,7 @@ export function ThemedText({
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
+        type === "large" ? styles.large : undefined,
         style,
       ]}
       {...rest}
@@ -54,6 +56,10 @@ const styles = StyleSheet.create({
   },
   subtext: {
     fontSize: 14,
+    lineHeight: 24,
+  },
+  large: {
+    fontSize: 16,
     lineHeight: 24,
   },
   defaultSemiBold: {

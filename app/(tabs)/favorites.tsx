@@ -24,6 +24,9 @@ import { StyleSheet } from "react-native";
 import ToolCard from "@/components/molecules/ToolCard";
 import { calculatePrice } from "@/utils/calculatePrice";
 import { averageRating } from "@/utils/averageRating";
+import { getSelectedItemCount } from "@/utils/handleClear";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const Favorites = () => {
   const [favoriteTools, setFavoriteTools] = useState<ITool[]>([]); // State to store favorite tools
@@ -49,6 +52,8 @@ const Favorites = () => {
   const [clearAllMode, setClearAllMode] = useState(false);
   const [clearMode, setClearMode] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isCheckBoxShow, setIsCheckBoxShow] = useState(false);
+  const [isClearMode, setIsClearMode] = useState(false);
 
   const isFocused = useIsFocused();
   const getArtTools = async () => {
@@ -84,19 +89,11 @@ const Favorites = () => {
       setLoading(false);
     }
   };
-  const toggleSelectAll = () => {
+  const toggleSelectAll = (selectAll: boolean) => {
     const newSelectedItems = {};
-    if (clearAllMode) {
-      // If in clear all mode, select all
-      favoriteTools.forEach((tool) => {
-        newSelectedItems[tool.id] = true;
-      });
-    } else {
-      // Otherwise, deselect all
-      favoriteTools.forEach((tool) => {
-        newSelectedItems[tool.id] = false;
-      });
-    }
+    favoriteTools.forEach((tool) => {
+      newSelectedItems[tool.id] = selectAll; // Select or deselect based on the flag
+    });
     setSelectedItems(newSelectedItems);
   };
 
@@ -110,27 +107,56 @@ const Favorites = () => {
 
       // Update AsyncStorage
       await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      setSelectedItems({});
-      setClearAllMode(false); // Exit clear all mode after removal
-      fetchFavorites(); // Refresh favorites list
+      clearDeleteFields();
     } catch (error) {
       console.error("Error removing favorites:", error);
     }
   };
 
+  const handleClickClearAllButton = () => {
+    setIsClearMode(true);
+    setClearAllMode((prevClearAllMode) => {
+      // Toggle the selection based on the previous state
+      toggleSelectAll(!prevClearAllMode);
+      return !prevClearAllMode; // Update the clear all mode state
+    });
+    setIsCheckBoxShow(true);
+  };
+
+  const handleExitClearMode = () => {
+    setIsClearMode(false);
+    setSelectedItems({});
+    setIsCheckBoxShow(false);
+  };
   useEffect(() => {
     getArtTools();
   }, []);
 
+  const clearDeleteFields = () => {
+    setSelectedItems({});
+    setClearMode(false);
+    setClearAllMode(false);
+    setIsModalVisible(false); // Exit clear all mode after removal
+    fetchFavorites();
+  };
   useEffect(() => {
     fetchFavorites();
   }, [favoriteTools, isFocused]);
+  useEffect(() => {
+    const selectedCount = getSelectedItemCount(selectedItems);
+
+    // If no items are selected, disable clear all mode
+    if (selectedCount === 0) {
+      setClearAllMode(false);
+    }
+  }, [selectedItems]);
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
       <View className="mt-3">
+        {/* handle search bar */}
         <ThemedText
           type="subtitle"
           lightColor={Colors.light.primary}
@@ -142,20 +168,63 @@ const Favorites = () => {
           <ActivityIndicator color={Colors.light.primary} />
         ) : favoriteTools.length > 0 ? (
           <ThemedView className="my-3">
-            <TouchableOpacity onPress={() => setClearAllMode(!clearAllMode)}>
-              <ThemedText>{clearAllMode ? "Cancel" : "Clear All"}</ThemedText>
-            </TouchableOpacity>
-            {clearMode ? (
-              <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-                <ThemedText>Clear</ThemedText>
-              </TouchableOpacity>
+            {/* Button clear, clear all, remove */}
+            <ThemedView
+              className={`flex-row items-center ${
+                isClearMode ? "justify-between" : "justify-end"
+              } `}
+            >
+              <ThemedView className="flex-row gap-2 items-center">
+                {isClearMode ? (
+                  <TouchableOpacity onPress={handleExitClearMode}>
+                    <AntDesign
+                      name="closecircleo"
+                      size={24}
+                      color={Colors.light.primary}
+                    />
+                  </TouchableOpacity>
+                ) : null}
+                {isClearMode ? (
+                  <ThemedView>
+                    <ThemedText
+                      type="large"
+                      lightColor={Colors.light.gray}
+                      darkColor={Colors.dark.gray}
+                    >
+                      {getSelectedItemCount(selectedItems)} items selected
+                    </ThemedText>
+                  </ThemedView>
+                ) : null}
+              </ThemedView>
+              <ThemedView className="flex-row gap-2">
+                <TouchableOpacity onPress={handleClickClearAllButton}>
+                  <ThemedView
+                    lightColor={Colors.light.background}
+                    darkColor={Colors.dark.background}
+                    style={{ borderColor: Colors.light.primary }}
+                    className="py-1 px-2 rounded-full border"
+                  >
+                    <ThemedText
+                      lightColor={Colors.light.primary}
+                      darkColor={Colors.dark.primary}
+                    >
+                      {clearAllMode ? "Deselect all" : "Clear All"}
+                    </ThemedText>
+                  </ThemedView>
+                </TouchableOpacity>
+              </ThemedView>
+            </ThemedView>
+            {isClearMode ? (
+              <ThemedView className="flex-row justify-end my-2">
+                <TouchableOpacity onPress={removeSelectedFavorites}>
+                  <FontAwesome5
+                    name="trash"
+                    size={24}
+                    color={Colors.light.primary}
+                  />
+                </TouchableOpacity>
+              </ThemedView>
             ) : null}
-
-            {selectedItems && isModalVisible && (
-              <TouchableOpacity onPress={removeSelectedFavorites}>
-                <ThemedText>Remove Selected</ThemedText>
-              </TouchableOpacity>
-            )}
             <ThemedView className="flex-wrap flex-row justify-between">
               {favoriteTools.map((item) => (
                 <View key={item.id} style={{ width: "48%" }}>
@@ -174,17 +243,19 @@ const Favorites = () => {
                     onPress={() => {
                       setSelectedItems((prev) => ({
                         ...prev,
-                        [item.id]: !prev[item.id],
+                        [item.id]: !prev[item.id], // Toggle selection
                       }));
                     }}
                     onLongPress={() => {
-                      setClearMode(true);
+                      setIsCheckBoxShow(true);
+                      // setClearMode(true);
                       setSelectedItems((prev) => ({
                         ...prev,
                         [item.id]: true,
                       }));
                     }}
                     noCardWidth
+                    isShowCheckBox={isCheckBoxShow}
                   />
                 </View>
               ))}

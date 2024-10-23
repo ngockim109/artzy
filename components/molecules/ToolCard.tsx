@@ -24,6 +24,7 @@ type ToolsProps = {
   noCardWidth?: boolean;
   id: string;
   isChecked?: boolean;
+  isShowCheckBox?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
 };
@@ -41,6 +42,7 @@ const ToolCard = ({
   isChecked = false,
   onPress,
   onLongPress,
+  isShowCheckBox = false,
 }: ToolsProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { showNotification } = useNotification();
@@ -87,7 +89,6 @@ const ToolCard = ({
       console.error(error);
     }
   };
-
   return (
     <>
       <View
@@ -104,21 +105,22 @@ const ToolCard = ({
             onPress={handleFavoritePress}
           />
         </View>
-        <View
-          className="absolute right-1 bottom-1 p-2 w-9 h-9"
-          style={{ display: isChecked ? "flex" : "none" }}
-        >
-          <CustomCheckbox isChecked={isChecked} onToggle={onPress} />
-        </View>
+        {isShowCheckBox ? (
+          <Pressable onPress={onPress} style={styles.checkboxContainer}>
+            <View style={[styles.checkbox, isChecked && styles.checked]}>
+              {isChecked && <View style={styles.checkmark} />}
+            </View>
+          </Pressable>
+        ) : null}
 
         <Pressable
           onLongPress={onLongPress}
-          // onPress={() =>
-          //   router.push({
-          //     pathname: "/tools/[id]",
-          //     params: { id: id },
-          //   })
-          // }
+          onPress={() =>
+            router.push({
+              pathname: "/tools/[id]",
+              params: { id: id },
+            })
+          }
         >
           <View>
             <Image
@@ -251,6 +253,29 @@ const styles = StyleSheet.create({
   },
   favoriteContainer: {
     zIndex: 100,
+  },
+  checkboxContainer: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    zIndex: 100,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: Colors.light.primary,
+    borderRadius: 3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checked: {
+    backgroundColor: Colors.light.primary,
+  },
+  checkmark: {
+    width: 12,
+    height: 12,
+    backgroundColor: "white",
   },
 });
 export default ToolCard;

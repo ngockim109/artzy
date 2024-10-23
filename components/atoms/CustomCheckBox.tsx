@@ -1,19 +1,19 @@
 import { Colors } from "@/constants/Colors";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const CustomCheckbox = ({
   isChecked,
-  onToggle,
+  onPress,
 }: {
   isChecked: boolean;
-  onToggle: (() => void) | undefined;
+  onPress: (() => void) | undefined;
 }) => {
   return (
-    <TouchableOpacity onPress={onToggle} style={styles.checkboxContainer}>
+    <Pressable onPress={onPress} style={styles.checkboxContainer}>
       <View style={[styles.checkbox, isChecked && styles.checked]}>
         {isChecked && <View style={styles.checkmark} />}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
