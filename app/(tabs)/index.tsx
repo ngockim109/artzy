@@ -111,7 +111,6 @@ export default function HomeScreen() {
       filters.onSale === null;
 
     setAreFiltersApplied(!isDefaultFilter);
-    console.log(areSortApplied + "sort");
     if (isDefaultFilter) {
       setPriceFilter("Any price");
       setGlassSurfaceFilter("All");
@@ -160,7 +159,6 @@ export default function HomeScreen() {
 
       const toolsToSort = areFiltersApplied ? filteredTools : tools;
       const sortedTools = sortTools(toolsToSort, sortOption);
-      console.log(areFiltersApplied);
       if (areFiltersApplied) {
         setFilteredTools(sortedTools);
       } else {
@@ -186,7 +184,6 @@ export default function HomeScreen() {
   );
   const loadFavoriteIds = async () => {
     const storedFavorites = await AsyncStorage.getItem("favorites");
-    console.log(storedFavorites);
     if (storedFavorites) {
       setFavoriteIds(JSON.parse(storedFavorites));
     }

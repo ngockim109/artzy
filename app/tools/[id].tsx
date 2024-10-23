@@ -44,7 +44,6 @@ const ToolDetail = () => {
         if (fetchedTool) {
           setTool(fetchedTool);
           const storedFavorites = await AsyncStorage.getItem("favorites");
-          console.log(storedFavorites);
           if (storedFavorites) {
             // Filter tools to find favorites by matching their IDs
             const favoriteIds = JSON.parse(storedFavorites);

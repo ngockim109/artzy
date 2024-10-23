@@ -1,10 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import {
   View,
   Text,
   ActivityIndicator,
   TouchableOpacity,
   Pressable,
+  TextInput,
 } from "react-native";
 import AsyncStorage, {
   useAsyncStorage,
@@ -27,6 +34,14 @@ import { averageRating } from "@/utils/averageRating";
 import { getSelectedItemCount } from "@/utils/handleClear";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 
 const Favorites = () => {
   const [favoriteTools, setFavoriteTools] = useState<ITool[]>([]); // State to store favorite tools
@@ -56,6 +71,29 @@ const Favorites = () => {
   const [isClearMode, setIsClearMode] = useState(false);
 
   const isFocused = useIsFocused();
+  const bottomSheetModalRemoveRef = useRef<BottomSheetModal>(null);
+
+  const toggleModalVisibility = () => {
+    if (isModalVisible) {
+      bottomSheetModalRemoveRef.current?.close(); // Close modal if it's visible
+    } else {
+      bottomSheetModalRemoveRef.current?.present(); // Open modal if it's not visible
+    }
+    setIsModalVisible(!isModalVisible); // Toggle the state
+  };
+  const renderBackdrop = React.useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.9}
+        onPress={() => bottomSheetModalRemoveRef.current?.close()}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
   const getArtTools = async () => {
     try {
       const response = await api.get("art-tools");
@@ -108,6 +146,8 @@ const Favorites = () => {
       // Update AsyncStorage
       await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
       clearDeleteFields();
+      setIsModalVisible(false);
+      bottomSheetModalRemoveRef.current?.close();
     } catch (error) {
       console.error("Error removing favorites:", error);
     }
@@ -136,20 +176,28 @@ const Favorites = () => {
     setSelectedItems({});
     setClearMode(false);
     setClearAllMode(false);
-    setIsModalVisible(false); // Exit clear all mode after removal
+    setIsModalVisible(false);
+    setIsClearMode(false);
+    setIsCheckBoxShow(false);
     fetchFavorites();
   };
   useEffect(() => {
     fetchFavorites();
-  }, [favoriteTools, isFocused]);
+  }, [isFocused]);
   useEffect(() => {
     const selectedCount = getSelectedItemCount(selectedItems);
 
     // If no items are selected, disable clear all mode
-    if (selectedCount === 0) {
+    if (selectedCount === 0 && clearAllMode) {
       setClearAllMode(false);
     }
   }, [selectedItems]);
+  const snapPoints = useMemo(() => ["25%"], []);
+  const handleModalDismiss = () => {
+    bottomSheetModalRemoveRef.current?.close();
+    // clearDeleteFields();
+    setIsModalVisible(false);
+  };
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
@@ -216,11 +264,20 @@ const Favorites = () => {
             </ThemedView>
             {isClearMode ? (
               <ThemedView className="flex-row justify-end my-2">
-                <TouchableOpacity onPress={removeSelectedFavorites}>
+                <TouchableOpacity
+                  onPress={toggleModalVisibility}
+                  disabled={
+                    getSelectedItemCount(selectedItems) <= 0 ? true : false
+                  }
+                >
                   <FontAwesome5
                     name="trash"
                     size={24}
-                    color={Colors.light.primary}
+                    color={
+                      getSelectedItemCount(selectedItems) <= 0
+                        ? Colors.light.gray
+                        : Colors.light.primary
+                    }
                   />
                 </TouchableOpacity>
               </ThemedView>
@@ -248,6 +305,7 @@ const Favorites = () => {
                     }}
                     onLongPress={() => {
                       setIsCheckBoxShow(true);
+                      setIsClearMode(true);
                       // setClearMode(true);
                       setSelectedItems((prev) => ({
                         ...prev,
@@ -272,8 +330,93 @@ const Favorites = () => {
           </ThemedView>
         )}
       </View>
+      <BottomSheetModal
+        ref={bottomSheetModalRemoveRef}
+        index={0}
+        snapPoints={snapPoints}
+        onDismiss={handleModalDismiss}
+        backdropComponent={renderBackdrop}
+      >
+        <TouchableWithoutFeedback onPress={handleModalDismiss}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+        <BottomSheetView style={styles.contentContainer}>
+          <ThemedText
+            type="subtitle"
+            className="mb-2"
+            lightColor={Colors.light.textCard}
+            darkColor={Colors.dark.textCard}
+          >
+            Confirm remove
+          </ThemedText>
+
+          <ThemedView
+            className="flex-row gap-2 mt-2"
+            darkColor={Colors.dark.bottomSheetBg}
+            lightColor={Colors.light.bottomSheetBg}
+          >
+            <ThemedText
+              lightColor={Colors.light.text}
+              darkColor={Colors.dark.text}
+            >
+              Remove {getSelectedItemCount(selectedItems)} items from favorites
+              list. You can add them to favorites list again!
+            </ThemedText>
+          </ThemedView>
+          <ThemedView className="flex-row gap-4 w-full px-5 justify-center">
+            <TouchableOpacity onPress={handleModalDismiss}>
+              <ThemedView
+                lightColor={Colors.light.background}
+                darkColor={Colors.dark.background}
+                className="w-full rounded-full p-2 mt-3"
+              >
+                <ThemedText
+                  type="defaultSemiBold"
+                  lightColor={Colors.light.buttonOutlineText}
+                  darkColor={Colors.dark.buttonOutlineText}
+                  className="text-center"
+                >
+                  Cancel
+                </ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={removeSelectedFavorites}>
+              <ThemedView
+                lightColor={Colors.light.primary}
+                darkColor={Colors.dark.primary}
+                className="w-full rounded-full p-2 mt-3"
+              >
+                <ThemedText
+                  type="defaultSemiBold"
+                  lightColor={Colors.light.buttonPrimaryText}
+                  darkColor={Colors.dark.buttonPrimaryText}
+                  className="text-center px-2"
+                >
+                  Remove
+                </ThemedText>
+              </ThemedView>
+            </TouchableOpacity>
+          </ThemedView>
+        </BottomSheetView>
+      </BottomSheetModal>
     </ParallaxScrollView>
   );
 };
+const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 25,
+  },
 
+  overlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
+    zIndex: 1,
+  },
+});
 export default Favorites;

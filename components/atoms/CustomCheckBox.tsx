@@ -10,7 +10,10 @@ const CustomCheckbox = ({
 }) => {
   return (
     <Pressable onPress={onPress} style={styles.checkboxContainer}>
-      <View style={[styles.checkbox, isChecked && styles.checked]}>
+      <View
+        style={[styles.checkbox, isChecked && styles.checked]}
+        className="rounded-full"
+      >
         {isChecked && <View style={styles.checkmark} />}
       </View>
     </Pressable>
@@ -26,7 +29,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderWidth: 1,
     borderColor: Colors.light.primary,
-    borderRadius: 3,
+    borderRadius: 9999,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -36,7 +39,7 @@ const styles = StyleSheet.create({
   checkmark: {
     width: 12,
     height: 12,
-    backgroundColor: "white",
+    backgroundColor: Colors.light.primary,
   },
 });
 export default CustomCheckbox;
