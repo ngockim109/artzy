@@ -33,8 +33,6 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { ActivityIndicator } from "react-native";
 
 import "@/styles/styles.css";
-import { Colors } from "@/constants/Colors";
-import { ThemedView } from "@/components/ThemedView";
 import Loading from "@/components/Loading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";

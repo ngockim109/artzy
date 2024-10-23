@@ -1,10 +1,10 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FavoriteIcon from "@/components/atoms/FavoriteIcon";
-import { useTheme } from "@react-navigation/native";
+import { useIsFocused, useTheme } from "@react-navigation/native";
 import { Colors } from "@/constants/Colors";
 import api from "@/api/api";
 import { ThemedText } from "@/components/ThemedText";
@@ -19,30 +19,75 @@ import { StarRatingDisplay } from "react-native-star-rating-widget";
 import CommonBadge from "@/components/atoms/CommonBadge";
 import { calculatePrice } from "@/utils/calculatePrice";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Tools from "@/components/Tools";
 
 const ToolDetail = () => {
   const { id } = useLocalSearchParams();
   const theme = useTheme() ?? "light";
   const [tool, setTool] = useState<ITool>();
   const [loading, setLoading] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [brandTools, setBrandTools] = useState<ITool[]>([]);
+  const [tools, setTools] = useState<ITool[]>([]);
 
   const router = useRouter();
+  const isFocused = useIsFocused();
 
-  const getTool = async () => {
+  const getTools = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/art-tools/" + id);
+      const response = await api.get("/art-tools/");
       if (response.status === 200) {
-        setTool(response.data);
-        setLoading(false);
+        setTools(response.data);
+        const fetchedTool = response.data.find((t: ITool) => t.id === id);
+        if (fetchedTool) {
+          setTool(fetchedTool);
+          const storedFavorites = await AsyncStorage.getItem("favorites");
+          console.log(storedFavorites);
+          if (storedFavorites) {
+            // Filter tools to find favorites by matching their IDs
+            const favoriteIds = JSON.parse(storedFavorites);
+            setIsFavorite(favoriteIds.includes(fetchedTool.id));
+            setLoading(false);
+          } else {
+            setIsFavorite(false); // No favorites stored, so set to false
+            setLoading(false);
+          }
+          const filteredBrandTools = response.data.filter(
+            (t: ITool) =>
+              t.brand === fetchedTool.brand && t.id !== fetchedTool.id
+          );
+          setBrandTools(filteredBrandTools);
+        }
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
+    }
+  };
+  const toggleFavorite = async () => {
+    try {
+      const storedFavorites = await AsyncStorage.getItem("favorites");
+      let favoriteIds = storedFavorites ? JSON.parse(storedFavorites) : [];
+
+      if (isFavorite) {
+        // Remove from favorites
+        favoriteIds = favoriteIds.filter((favId: string) => favId !== tool?.id);
+      } else {
+        // Add to favorites
+        favoriteIds.push(tool?.id);
+      }
+
+      await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));
+      setIsFavorite(!isFavorite); // Toggle favorite state
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
     }
   };
 
   useEffect(() => {
-    getTool();
+    getTools();
   }, [id]);
   return loading ? (
     <Loading />
@@ -71,13 +116,13 @@ const ToolDetail = () => {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity onPress={toggleFavorite}>
               <View
                 className="rounded-full p-3"
                 style={{ backgroundColor: Colors.light.grayLight }}
               >
                 <FavoriteIcon
-                  favorite
+                  favorite={isFavorite}
                   color={theme ? Colors.light.highlight : Colors.dark.highlight}
                 />
               </View>
@@ -172,6 +217,29 @@ const ToolDetail = () => {
           </ThemedText>
         </ThemedView>
 
+        <ThemedView className="my-3">
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/tools/[id]/feedbacks",
+                params: { id: tool?.id },
+              })
+            }
+          >
+            <ThemedText type="subtitle">Customer Reviews</ThemedText>
+          </TouchableOpacity>
+          {tool?.feedbacks && tool?.feedbacks?.length > 0 ? (
+            <PreviewFeedback feedbacks={tool?.feedbacks} toolId={tool?.id} />
+          ) : (
+            <ThemedView>
+              <ThemedText>
+                There are no feedbacks. Shopping to be the first comment now.
+              </ThemedText>
+            </ThemedView>
+          )}
+        </ThemedView>
+      </View>
+      {tool ? (
         <ThemedView
           className="py-3 border-b"
           style={{
@@ -200,29 +268,13 @@ const ToolDetail = () => {
             </ThemedView>
           </TouchableOpacity>
         </ThemedView>
-
-        <ThemedView className="my-3">
-          <TouchableOpacity
-            onPress={() =>
-              router.push({
-                pathname: "/tools/[id]/feedbacks",
-                params: { id: tool?.id },
-              })
-            }
-          >
-            <ThemedText type="subtitle">Customer Reviews</ThemedText>
-          </TouchableOpacity>
-          {tool?.feedbacks && tool?.feedbacks?.length > 0 ? (
-            <PreviewFeedback feedbacks={tool?.feedbacks} toolId={tool?.id} />
-          ) : (
-            <ThemedView>
-              <ThemedText>
-                There are no feedbacks. Shopping to be the first comment now.
-              </ThemedText>
-            </ThemedView>
-          )}
-        </ThemedView>
-      </View>
+      ) : null}
+      {brandTools.length > 0 ? (
+        <>
+          <ThemedText type="defaultSemiBold">Products same brand </ThemedText>
+          <Tools toolData={brandTools} />
+        </>
+      ) : null}
     </ParallaxScrollView>
   );
 };

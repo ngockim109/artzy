@@ -193,8 +193,6 @@ const Filters = ({ onFilterChange }) => {
       alert("Max price cannot be less than or equal min price.");
       return;
     }
-    console.log(minPrice);
-    console.log(maxPrice);
     if (minPrice === "") {
       setPriceText(`Any to $${maxPrice}`);
     } else if (maxPrice === "") {

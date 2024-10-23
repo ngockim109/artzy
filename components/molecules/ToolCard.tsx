@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet } from "react-native";
+import { View, Image, StyleSheet, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import CommonBadge from "@/components/atoms/CommonBadge";
@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Alert } from "react-native";
 import { useNotification } from "../atoms/NotificationContext";
+import CustomCheckbox from "../atoms/CustomCheckBox";
 
 type ToolsProps = {
   source: string;
@@ -22,6 +23,9 @@ type ToolsProps = {
   glassSurface: boolean;
   noCardWidth?: boolean;
   id: string;
+  isChecked?: boolean;
+  onPress?: () => void;
+  onLongPress?: () => void;
 };
 const ToolCard = ({
   source,
@@ -34,15 +38,23 @@ const ToolCard = ({
   id,
   glassSurface,
   noCardWidth = false,
+  isChecked = false,
+  onPress,
+  onLongPress,
 }: ToolsProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { showNotification } = useNotification();
   useEffect(() => {
     loadFavorite();
-  }, []);
+  }, [setIsFavorite]);
+  useEffect(() => {
+    loadFavorite();
+    console.log(isFavorite, id);
+  }, [isFavorite]);
   const loadFavorite = async () => {
     try {
       const favoriteItems = await AsyncStorage.getItem("favorites");
+      console.log(favoriteItems);
       if (favoriteItems) {
         const favoriteItemsArray = JSON.parse(favoriteItems);
         setIsFavorite(favoriteItemsArray.includes(id));
@@ -92,13 +104,21 @@ const ToolCard = ({
             onPress={handleFavoritePress}
           />
         </View>
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/tools/[id]",
-              params: { id: id },
-            })
-          }
+        <View
+          className="absolute right-1 bottom-1 p-2 w-9 h-9"
+          style={{ display: isChecked ? "flex" : "none" }}
+        >
+          <CustomCheckbox isChecked={isChecked} onToggle={onPress} />
+        </View>
+
+        <Pressable
+          onLongPress={onLongPress}
+          // onPress={() =>
+          //   router.push({
+          //     pathname: "/tools/[id]",
+          //     params: { id: id },
+          //   })
+          // }
         >
           <View>
             <Image
@@ -186,7 +206,7 @@ const ToolCard = ({
               </View>
             </View>
           </View>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </>
   );

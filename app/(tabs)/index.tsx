@@ -29,6 +29,8 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { filterTools } from "@/utils/filterTools";
 import SortTools from "@/components/SortTools";
 import { sortTools } from "@/utils/sortData";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -47,6 +49,9 @@ export default function HomeScreen() {
   const [priceFilter, setPriceFilter] = useState<string>("Any price");
   const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<string>("All");
   const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+
+  const isFocused = useIsFocused();
 
   const router = useRouter();
   const onChangeSearchValue = (text: string) => setSearchValue(text);
@@ -179,16 +184,31 @@ export default function HomeScreen() {
       resetFiltersAndSorting(); // Reset state on focus
     }, [originalTools]) // Only reset when the original tools are loaded
   );
+  const loadFavoriteIds = async () => {
+    const storedFavorites = await AsyncStorage.getItem("favorites");
+    console.log(storedFavorites);
+    if (storedFavorites) {
+      setFavoriteIds(JSON.parse(storedFavorites));
+    }
+  };
+
+  useEffect(() => {
+    getArtTools();
+    loadFavoriteIds();
+  }, [isFocused]);
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
       hideHeader
     >
-      <SearchBar
-        value={searchValue}
-        onChangeText={onChangeSearchValue}
-        handleSearch={handleSearch}
-      />
+      <View className="mt-3">
+        <SearchBar
+          value={searchValue}
+          onChangeText={onChangeSearchValue}
+          handleSearch={handleSearch}
+        />
+      </View>
       <ThemedText
         type="subtitle"
         lightColor={Colors.light.subtitle}
