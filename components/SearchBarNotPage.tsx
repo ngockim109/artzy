@@ -14,12 +14,14 @@ type SearchBarProps = {
   onChangeText: (text: string) => void;
   handleSearch: () => void;
   clearSearchValue: () => void;
+  isSearch: boolean;
 };
 const SearchBarNotPage = ({
   value,
   onChangeText,
   handleSearch,
   clearSearchValue,
+  isSearch,
 }: SearchBarProps) => {
   const theme = useColorScheme() ?? "light";
   const textColor = useThemeColor({}, "textSearchBar");
@@ -52,7 +54,7 @@ const SearchBarNotPage = ({
           </Pressable>
         )}
       </View>
-      {value.length > 0 ? (
+      {isSearch ? (
         <View style={styles.card}>
           <Pressable
             onPress={handleSearch}

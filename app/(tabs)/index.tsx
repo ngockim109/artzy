@@ -51,12 +51,19 @@ export default function HomeScreen() {
   const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<string>("All");
   const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [isSearch, setIsSearch] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
   const router = useRouter();
-  const onChangeSearchValue = (text: string) => setSearchValue(text);
-  const clearSearchValue = () => setSearchValue("");
+  const onChangeSearchValue = (text: string) => {
+    setSearchValue(text);
+    setIsSearch(true);
+  };
+  const clearSearchValue = () => {
+    setSearchValue("");
+    setIsSearch(false);
+  };
   const handleSearch = () => {
     // Apply search by toolName in the current tools list
     const searchResults = originalTools.filter((tool) =>
@@ -64,6 +71,7 @@ export default function HomeScreen() {
     );
     setFilteredTools(searchResults);
     setAreFiltersApplied(searchValue.length > 0);
+    setIsSearch(false);
   };
 
   const getArtTools = async () => {
@@ -209,6 +217,7 @@ export default function HomeScreen() {
           value={searchValue}
           onChangeText={onChangeSearchValue}
           handleSearch={handleSearch}
+          isSearch={isSearch}
           clearSearchValue={clearSearchValue}
         />
       </View>
