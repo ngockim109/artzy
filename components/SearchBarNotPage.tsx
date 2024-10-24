@@ -27,7 +27,6 @@ const SearchBarNotPage = ({
   const textColor = useThemeColor({}, "textSearchBar");
   const placeholderColor = useThemeColor({}, "textSearchBar");
   const searchButtonColor = useThemeColor({}, "search");
-  console.log(value);
   return (
     <View>
       <View
@@ -35,6 +34,11 @@ const SearchBarNotPage = ({
           theme === "light" ? " border-primary" : " border-primary-light"
         } `}
       >
+        <AntDesign
+          name="search1"
+          size={16}
+          color={Colors.light.gray}
+        ></AntDesign>
         <TextInput
           value={value}
           onChangeText={onChangeText}

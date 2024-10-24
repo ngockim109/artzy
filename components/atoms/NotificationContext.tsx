@@ -14,23 +14,11 @@ export const NotificationProvider = ({ children }) => {
     null
   );
   const [notificationVisible, setNotificationVisible] = useState(false);
-  // const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
   const showNotification = (message: string) => {
-    // if (timeoutId) {
-    //   clearTimeout(timeoutId);
-    // }
-    // console.log(timeoutId);
-
     setNotificationMessage(message);
     setNotificationVisible(true);
 
-    // Hide notification after 4 seconds
-    // const newTimeoutId = setTimeout(() => {
-    //   setNotificationVisible(false);
-    //   setNotificationMessage(null);
-    // }, 4000);
-    // setTimeoutId(newTimeoutId);
     setTimeout(() => {
       setNotificationVisible(false);
     }, 4000);

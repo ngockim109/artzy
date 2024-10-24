@@ -36,6 +36,7 @@ import SearchBarNotPage from "@/components/SearchBarNotPage";
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
   const [originalTools, setOriginalTools] = useState<ITool[]>([]);
+  const [searchedTools, setSearchedTools] = useState<ITool[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [brandLoading, setBrandLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,21 +56,24 @@ export default function HomeScreen() {
 
   const isFocused = useIsFocused();
 
-  const router = useRouter();
   const onChangeSearchValue = (text: string) => {
     setSearchValue(text);
-    setIsSearch(true);
+    text.trim().length > 0 ? setIsSearch(true) : setIsSearch(false);
   };
   const clearSearchValue = () => {
     setSearchValue("");
     setIsSearch(false);
   };
   const handleSearch = () => {
-    // Apply search by toolName in the current tools list
-    const searchResults = originalTools.filter((tool) =>
-      tool.artName.toLowerCase().includes(searchValue.toLowerCase())
-    );
-    setFilteredTools(searchResults);
+    if (searchValue.trim()) {
+      const searchResults = originalTools.filter(
+        (tool) =>
+          tool.artName.toLowerCase().includes(searchValue.toLowerCase()) ||
+          tool.description.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setSearchedTools(searchResults);
+    }
+
     setAreFiltersApplied(searchValue.length > 0);
     setIsSearch(false);
   };
@@ -186,14 +190,13 @@ export default function HomeScreen() {
     setCurrentSortOption("relevant");
     setAreFiltersApplied(false);
     setAreSortApplied(false);
-    setTools(originalTools); // Reset to the original list
+    setTools(originalTools);
   };
 
-  // Use useFocusEffect to reset filters and sorting when the screen gains focus
   useFocusEffect(
     useCallback(() => {
-      resetFiltersAndSorting(); // Reset state on focus
-    }, [originalTools]) // Only reset when the original tools are loaded
+      resetFiltersAndSorting();
+    }, [originalTools])
   );
   const loadFavoriteIds = async () => {
     const storedFavorites = await AsyncStorage.getItem("favorites");
