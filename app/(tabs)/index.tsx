@@ -242,7 +242,7 @@ export default function HomeScreen() {
         lightColor={Colors.light.subtitle}
         darkColor={Colors.dark.subtitle}
       >
-        All brands
+        Brands
       </ThemedText>
 
       {brandLoading ? (
@@ -255,7 +255,7 @@ export default function HomeScreen() {
         lightColor={Colors.light.subtitle}
         darkColor={Colors.dark.subtitle}
       >
-        All products
+        Products
       </ThemedText>
       <Filters onFilterChange={applyFilters} />
       <SortTools onSortChange={handleSortChange} />

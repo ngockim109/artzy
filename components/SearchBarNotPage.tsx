@@ -42,7 +42,7 @@ const SearchBarNotPage = ({
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          placeholder="Search tool name..."
+          placeholder="Search tool name and description..."
           style={{
             color: placeholderColor,
           }}
