@@ -19,7 +19,7 @@ import Filters from "@/components/Filters";
 
 import "@/styles/styles.css";
 import api from "@/api/api";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ITool from "@/interface/tool.interface";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
@@ -49,33 +49,40 @@ export default function HomeScreen() {
     useState<string>("relevant");
 
   const [priceFilter, setPriceFilter] = useState<string>("Any price");
-  const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<string>("All");
+  const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<
+    "All" | "true" | "false"
+  >("All");
   const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [isSearch, setIsSearch] = useState<boolean>(false);
+  const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
   const onChangeSearchValue = (text: string) => {
     setSearchValue(text);
-    text.trim().length > 0 ? setIsSearch(true) : setIsSearch(false);
+    if (text.trim().length > 0) {
+      setIsSearch(true);
+    } else {
+      setIsSearch(false);
+    }
   };
   const clearSearchValue = () => {
     setSearchValue("");
     setIsSearch(false);
+    setIsSearchMode(false);
   };
   const handleSearch = () => {
     if (searchValue.trim()) {
-      const searchResults = originalTools.filter(
+      const searchResults = tools.filter(
         (tool) =>
           tool.artName.toLowerCase().includes(searchValue.toLowerCase()) ||
           tool.description.toLowerCase().includes(searchValue.toLowerCase())
       );
       setSearchedTools(searchResults);
     }
-
-    setAreFiltersApplied(searchValue.length > 0);
     setIsSearch(false);
+    setIsSearchMode(true);
   };
 
   const getArtTools = async () => {
@@ -87,20 +94,20 @@ export default function HomeScreen() {
         setTools(response.data);
         setOriginalTools(response.data);
         setLoading(false);
-        const brandData = response.data.map((data) => ({
+        const brandData = response.data.map((data: ITool) => ({
           id: data.brand,
           brand: data.brand,
           brandImage: data.brandImage,
         }));
 
         const uniqueBrandData = brandData.filter(
-          (brandItem: IBrand, index, self) =>
+          (brandItem: IBrand, index: number, self: ITool[]) =>
             index === self.findIndex((b) => b.brand === brandItem.brand)
         );
         setBrands(uniqueBrandData);
         setBrandLoading(false);
       } else {
-        console.error("Error fetching art tools: ", error);
+        console.error("Error fetching art tools.");
       }
     } catch (error) {
       console.error(error);
@@ -111,13 +118,6 @@ export default function HomeScreen() {
     getArtTools();
   }, []);
   const applyFilters = (filters) => {
-    const filteredResults = filterTools({
-      originalTools: originalTools,
-      price: filters.price,
-      glassSurfaces: filters.glassSurface,
-      onSale: filters.onSale,
-    });
-
     setPriceFilter(filters.price);
     setGlassSurfaceFilter(filters.glassSurface);
     setOnSaleFilter(filters.onSale);
@@ -133,71 +133,34 @@ export default function HomeScreen() {
       setGlassSurfaceFilter("All");
       setOnSaleFilter(null);
     }
-    if (areSortApplied) {
-      if (isDefaultFilter) {
-        const filteredResults = filterTools({
-          originalTools: originalTools,
-          price: "Any price",
-          glassSurfaces: "All",
-          onSale: null,
-        });
-        setFilteredTools(filteredResults);
-      } else {
-        const sortedFilteredResults = sortTools(
-          filteredResults,
-          currentSortOption
-        );
-        setFilteredTools(sortedFilteredResults);
-      }
-    } else {
-      setFilteredTools(filteredResults);
-    }
   };
 
-  const handleSortChange = (sortOption) => {
+  const handleSortChange = (sortOption: string) => {
     setCurrentSortOption(sortOption);
     if (sortOption === "relevant") {
       setAreSortApplied(false);
-
-      // Reset tools to original data
-      const filteredResults = filterTools({
-        originalTools: originalTools,
-        price: priceFilter,
-        glassSurfaces: glassSurfaceFilter,
-        onSale: onSaleFilter,
-      });
-      if (areFiltersApplied) {
-        setFilteredTools(filteredResults);
-      } else {
-        setTools(originalTools);
-      }
     } else {
       setAreSortApplied(true);
-
-      const toolsToSort = areFiltersApplied ? filteredTools : tools;
-      const sortedTools = sortTools(toolsToSort, sortOption);
-      if (areFiltersApplied) {
-        setFilteredTools(sortedTools);
-      } else {
-        setTools(sortedTools);
-      }
     }
   };
-  const resetFiltersAndSorting = () => {
+  const resetFilters = () => {
     setPriceFilter("Any price");
     setGlassSurfaceFilter("All");
     setOnSaleFilter(null);
-    setCurrentSortOption("relevant");
     setAreFiltersApplied(false);
+    // setTools(originalTools);
+  };
+  const resetSorting = () => {
+    setCurrentSortOption("relevant");
     setAreSortApplied(false);
     setTools(originalTools);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      resetFiltersAndSorting();
-    }, [originalTools])
-  );
+  const resetSearch = () => {
+    setSearchValue("");
+    setIsSearch(false);
+  };
+
   const loadFavoriteIds = async () => {
     const storedFavorites = await AsyncStorage.getItem("favorites");
     if (storedFavorites) {
@@ -205,11 +168,61 @@ export default function HomeScreen() {
     }
   };
 
+  const renderData = useMemo(() => {
+    let dataToRender: ITool[];
+    // original data
+    if (
+      searchValue?.trim().length <= 0 &&
+      !areFiltersApplied &&
+      !areSortApplied
+    ) {
+      dataToRender = tools;
+    } else if (searchValue?.trim().length > 0) {
+      // render when search is applied
+      dataToRender = searchedTools;
+      if (areFiltersApplied) {
+        dataToRender = filterTools({
+          originalTools: searchedTools,
+          price: priceFilter,
+          glassSurfaces: glassSurfaceFilter,
+          onSale: onSaleFilter,
+        });
+      }
+      if (areSortApplied) {
+        dataToRender = sortTools(dataToRender, currentSortOption);
+      }
+    } else {
+      // when search is not applied
+      dataToRender = tools;
+      if (areFiltersApplied) {
+        dataToRender = filterTools({
+          originalTools: tools,
+          price: priceFilter,
+          glassSurfaces: glassSurfaceFilter,
+          onSale: onSaleFilter,
+        });
+      }
+      if (areSortApplied) {
+        dataToRender = sortTools(dataToRender, currentSortOption);
+      }
+    }
+    return dataToRender;
+  }, [
+    isSearchMode,
+    areFiltersApplied,
+    areSortApplied,
+    tools,
+    searchedTools,
+    priceFilter,
+    glassSurfaceFilter,
+    onSaleFilter,
+    currentSortOption,
+  ]);
+
   useEffect(() => {
     getArtTools();
     loadFavoriteIds();
   }, [isFocused]);
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
@@ -248,28 +261,7 @@ export default function HomeScreen() {
       <SortTools onSortChange={handleSortChange} />
       {loading ? (
         <LoadingSmall />
-      ) : areFiltersApplied ? (
-        filteredTools == null || filteredTools.length <= 0 ? (
-          <Empty
-            icon="frown"
-            description="No products here!"
-            title="Empty"
-            noAction
-          />
-        ) : (
-          <>
-            <ThemedText
-              className="text-right"
-              type="blurText"
-              lightColor={Colors.light.gray}
-              darkColor={Colors.dark.gray}
-            >
-              Showing {filteredTools.length} data
-            </ThemedText>
-            <Tools toolData={filteredTools} />
-          </>
-        )
-      ) : tools == null || tools.length <= 0 ? (
+      ) : renderData == null || renderData?.length <= 0 ? (
         <Empty
           icon="frown"
           description="No products here!"
@@ -284,30 +276,11 @@ export default function HomeScreen() {
             lightColor={Colors.light.gray}
             darkColor={Colors.dark.gray}
           >
-            Showing all {tools.length} data
+            Showing {renderData.length} data
           </ThemedText>
-          <Tools toolData={tools} />
+          <Tools toolData={renderData} />
         </>
       )}
     </ParallaxScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-  },
-});

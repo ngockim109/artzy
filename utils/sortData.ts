@@ -3,14 +3,7 @@ import { calculatePrice } from "./calculatePrice";
 
 export const sortTools = (
   tools: ITool[],
-  sortBy:
-    | "relevant"
-    | "highestPrice"
-    | "lowestPrice"
-    | "highestDeal"
-    | "lowestAvgReview"
-    | "highestAvgReview"
-    | "lowestDeal" = "relevant"
+  sortBy: string = "relevant"
 ): ITool[] => {
   // Helper to calculate final price after deal
   const getFinalPrice = (tool: ITool): number => {

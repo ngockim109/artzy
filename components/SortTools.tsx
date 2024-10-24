@@ -16,7 +16,10 @@ import { ThemedView } from "./ThemedView";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFocusEffect } from "expo-router";
 
-const SortTools = ({ onSortChange }) => {
+type SortToolsProps = {
+  onSortChange: (text: string) => void;
+};
+const SortTools = ({ onSortChange }: SortToolsProps) => {
   const theme = useColorScheme() ?? "light";
   const [sortText, setSortText] = useState<string>("Sort");
   const [sortField, setSortField] = useState<string>("relevant");
