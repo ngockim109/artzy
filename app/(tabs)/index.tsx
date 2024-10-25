@@ -32,6 +32,7 @@ import { sortTools } from "@/utils/sortData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import SearchBarNotPage from "@/components/SearchBarNotPage";
+import React from "react";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -52,6 +53,7 @@ export default function HomeScreen() {
   const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<
     "All" | "true" | "false"
   >("All");
+  const [brandFilter, setBrandFilter] = useState<string>("All");
   const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [isSearch, setIsSearch] = useState<boolean>(false);
@@ -121,17 +123,19 @@ export default function HomeScreen() {
     setPriceFilter(filters.price);
     setGlassSurfaceFilter(filters.glassSurface);
     setOnSaleFilter(filters.onSale);
-
+    setBrandFilter(filters.brandFilter);
     const isDefaultFilter =
       filters.price === "Any price" &&
       filters.glassSurface === "All" &&
-      filters.onSale === null;
+      filters.onSale === null &&
+      filters.brandFilter === "All";
 
     setAreFiltersApplied(!isDefaultFilter);
     if (isDefaultFilter) {
       setPriceFilter("Any price");
       setGlassSurfaceFilter("All");
       setOnSaleFilter(null);
+      setBrandFilter("All");
     }
   };
 
@@ -148,6 +152,7 @@ export default function HomeScreen() {
     setGlassSurfaceFilter("All");
     setOnSaleFilter(null);
     setAreFiltersApplied(false);
+    setBrandFilter("All");
     // setTools(originalTools);
   };
   const resetSorting = () => {
@@ -186,6 +191,7 @@ export default function HomeScreen() {
           price: priceFilter,
           glassSurfaces: glassSurfaceFilter,
           onSale: onSaleFilter,
+          brandFilter: brandFilter,
         });
       }
       if (areSortApplied) {
@@ -200,6 +206,7 @@ export default function HomeScreen() {
           price: priceFilter,
           glassSurfaces: glassSurfaceFilter,
           onSale: onSaleFilter,
+          brandFilter: brandFilter,
         });
       }
       if (areSortApplied) {
@@ -215,6 +222,7 @@ export default function HomeScreen() {
     searchedTools,
     priceFilter,
     glassSurfaceFilter,
+    brandFilter,
     onSaleFilter,
     currentSortOption,
   ]);
@@ -260,7 +268,7 @@ export default function HomeScreen() {
       >
         Products
       </ThemedText>
-      <Filters onFilterChange={applyFilters} />
+      <Filters onFilterChange={applyFilters} brands={brands} />
       <SortTools onSortChange={handleSortChange} />
       {loading ? (
         <LoadingSmall />

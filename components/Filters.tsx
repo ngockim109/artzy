@@ -30,7 +30,7 @@ import { ThemedView } from "./ThemedView";
 import { filterTools, isValidPrice } from "@/utils/filterTools";
 import { useFocusEffect } from "expo-router";
 
-const Filters = ({ onFilterChange }) => {
+const Filters = ({ onFilterChange, brands }) => {
   const theme = useColorScheme() ?? "light";
   const [activeIndex, setActiveIndex] = useState();
   const [price, setPrice] = useState<string>("Any price");
@@ -45,7 +45,7 @@ const Filters = ({ onFilterChange }) => {
   const [isGlassSurfaceModalVisible, setIsGlassSurfaceModalVisible] =
     useState<boolean>(false);
   const bottomSheetModalGlassSurfaceRef = useRef<BottomSheetModal>(null);
-
+  const [isBrandSelected, setIsBrandSelected] = useState<string>("All");
   const DATA = [
     {
       id: "1",
@@ -128,6 +128,7 @@ const Filters = ({ onFilterChange }) => {
         price: priceFilter,
         onSale: updatedOnSale,
         glassSurface,
+        brandFilter: isBrandSelected,
       });
     } else if (item?.id === "1") {
       setPrice("Any price");
@@ -141,8 +142,21 @@ const Filters = ({ onFilterChange }) => {
         price: "Any price",
         onSale: null,
         glassSurface: "All",
+        brandFilter: isBrandSelected,
       });
     }
+  };
+  const handleSelectBrand = (item) => {
+    console.log(item);
+    setIsBrandSelected(item?.brand ?? "");
+    let priceFilter =
+      price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
+    onFilterChange({
+      price: priceFilter,
+      onSale,
+      glassSurface,
+      brandFilter: item?.brand,
+    });
   };
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -177,7 +191,12 @@ const Filters = ({ onFilterChange }) => {
     setIsGlassSurfaceModalVisible(false);
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
-    onFilterChange({ price: priceFilter, onSale, glassSurface: value });
+    onFilterChange({
+      price: priceFilter,
+      onSale,
+      glassSurface: value,
+      brandFilter: isBrandSelected,
+    });
   };
   const handlePriceFilter = () => {
     if (
@@ -204,7 +223,12 @@ const Filters = ({ onFilterChange }) => {
     let priceFilter =
       price === "InRange" ? `${minPrice}-${maxPrice}` : "Any price";
 
-    onFilterChange({ price: priceFilter, onSale, glassSurface });
+    onFilterChange({
+      price: priceFilter,
+      onSale,
+      glassSurface,
+      brandFilter: isBrandSelected,
+    });
     bottomSheetModalRef.current?.close();
     setIsModalVisible(false);
   };
@@ -217,6 +241,7 @@ const Filters = ({ onFilterChange }) => {
       setMinPrice("");
       setMaxPrice("");
       setGlassSurface("All");
+      setIsBrandSelected("All");
       setGlassSurfaceText("Categories");
       setOnSale(null);
     }, [])
@@ -224,6 +249,52 @@ const Filters = ({ onFilterChange }) => {
 
   return (
     <>
+      <FlatList
+        data={[{ id: "All", brand: "All", brandImage: "" }, ...brands]}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => {
+          return (
+            <View className="relative ">
+              <Pressable
+                onPress={() => handleSelectBrand(item)}
+                style={({ pressed }) => [
+                  styles.pressable,
+                  {
+                    opacity: pressed ? 0.7 : 1,
+                    backgroundColor:
+                      item?.brand === isBrandSelected
+                        ? theme === "light"
+                          ? Colors.light.primary
+                          : Colors.dark.primary
+                        : "white",
+                    borderColor:
+                      theme === "light"
+                        ? Colors.light.secondary
+                        : Colors.dark.secondary,
+                  },
+                ]}
+              >
+                <ThemedText
+                  lightColor={
+                    item?.brand === isBrandSelected
+                      ? "white"
+                      : Colors.light.buttonOutlineText
+                  }
+                  darkColor={
+                    item?.brand === isBrandSelected
+                      ? "white"
+                      : Colors.dark.buttonOutlineText
+                  }
+                >
+                  {item.brand === "All" ? "All" : `${item.brand}`}
+                </ThemedText>
+              </Pressable>
+            </View>
+          );
+        }}
+        keyExtractor={(item) => item?.id}
+      />
       <FlatList
         data={DATA}
         horizontal
@@ -235,7 +306,7 @@ const Filters = ({ onFilterChange }) => {
             onSale !== null ? 1 : 0,
           ].reduce((acc, cur) => acc + cur, 0);
           return (
-            <View className="relative py-2">
+            <View className="relative">
               <Pressable
                 onPress={() => handleSelectFilter(item)}
                 style={({ pressed }) => [

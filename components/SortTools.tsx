@@ -96,7 +96,7 @@ const SortTools = ({ onSortChange }: SortToolsProps) => {
   );
   return (
     <>
-      <ThemedView className="py-2 flex-row justify-end">
+      <ThemedView className="flex-row justify-end">
         <Pressable
           onPress={() => handleSelectFilter()}
           style={({ pressed }) => [
