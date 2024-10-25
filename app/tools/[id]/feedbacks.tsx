@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -22,6 +22,8 @@ import FilterStar from "@/components/templates/FilterStar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FavoriteIcon from "@/components/atoms/FavoriteIcon";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import SortFeedbacks from "@/components/SortFeedbacks";
+import { sortFeedbacks } from "@/utils/sortFeedbacks";
 
 const feedbacks = () => {
   const { id } = useLocalSearchParams();
@@ -30,6 +32,9 @@ const feedbacks = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [avgRating, setAvgRating] = useState<number>(0);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<IFeedback[]>([]);
+  const [currentSortOption, setCurrentSortOption] =
+    useState<string>("relevant");
+  const [areSortApplied, setAreSortApplied] = useState(false);
 
   const router = useRouter();
   const highlightIcon = useThemeColor({}, "highlight");
@@ -82,16 +87,15 @@ const feedbacks = () => {
   };
 
   const applyFilter = (selectedId: string) => {
-    if (selectedId === "All") {
-      // Show all feedbacks if "All" is selected
-      setFilteredFeedbacks(tool?.feedbacks ?? []);
-    } else {
-      // Filter feedbacks by the selected star rating
-      const filtered = (tool?.feedbacks ?? []).filter(
+    let feedbacksToDisplay = tool?.feedbacks ?? [];
+    if (selectedId !== "All") {
+      feedbacksToDisplay = feedbacksToDisplay.filter(
         (feedback) => feedback.rating === Number(selectedId)
       );
-      setFilteredFeedbacks(filtered);
     }
+    feedbacksToDisplay = sortFeedbacks(feedbacksToDisplay, currentSortOption);
+
+    setFilteredFeedbacks(feedbacksToDisplay);
   };
 
   const checkFeedbacksComments = (feedbacks: IFeedback[]): boolean => {
@@ -99,6 +103,14 @@ const feedbacks = () => {
       (fb) => fb?.comment !== undefined && fb?.comment !== ""
     );
   };
+  const handleSortChange = (sortOption: string) => {
+    setCurrentSortOption(sortOption);
+    const sortedFeedbacks = sortFeedbacks(filteredFeedbacks, sortOption);
+    setFilteredFeedbacks(sortedFeedbacks);
+
+    setAreSortApplied(sortOption !== "relevant");
+  };
+
   useEffect(() => {
     getTools();
   }, [id]);
@@ -157,7 +169,7 @@ const feedbacks = () => {
               key={5 - index}
               className="flex-row gap-1 items-center mt-2"
             >
-              <ThemedText style={{ width: 60 }}>
+              <ThemedText style={{ width: 70 }}>
                 {5 - index} star{5 - index === 1 ? "" : "s"}
               </ThemedText>
               <RatingBar
@@ -174,6 +186,7 @@ const feedbacks = () => {
             onFilterChange={applyFilter}
             feedbacks={tool?.feedbacks ?? []}
           />
+          <SortFeedbacks onSortChange={handleSortChange} />
           {checkFeedbacksComments(filteredFeedbacks ?? []) ? (
             filteredFeedbacks.map((feedback) => (
               <FeedbackItem

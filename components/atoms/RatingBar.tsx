@@ -43,7 +43,7 @@ const RatingBar = ({ allRating, numberOfRating }: RatingBarProps) => {
         />
       </View>
       <ThemedText style={styles.percentageText}>
-        {Math.round(percentage)}% ({numberOfRating})
+        {Math.round(percentage)}%
       </ThemedText>
     </View>
   );
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   progressContainer: {
-    width: "70%",
+    width: "80%",
     height: 10,
     backgroundColor: "#e0e0e0",
     borderRadius: 5,

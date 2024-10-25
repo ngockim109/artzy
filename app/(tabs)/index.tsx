@@ -1,31 +1,19 @@
-import {
-  Image,
-  StyleSheet,
-  Platform,
-  View,
-  Text,
-  ActivityIndicator,
-} from "react-native";
+import { View } from "react-native";
 
-import { HelloWave } from "@/components/HelloWave";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import SearchBar from "@/components/SearchBar";
 import Brands from "@/components/Brands";
-import Categories from "@/components/Categories";
 import { Colors } from "@/constants/Colors";
 import Filters from "@/components/Filters";
 
 import "@/styles/styles.css";
 import api from "@/api/api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ITool from "@/interface/tool.interface";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
 import IBrand from "@/interface/brand.interface";
 import LoadingSmall from "@/components/LoadingSmall";
-import { useFocusEffect, useRouter } from "expo-router";
 import { filterTools } from "@/utils/filterTools";
 import SortTools from "@/components/SortTools";
 import { sortTools } from "@/utils/sortData";
@@ -43,7 +31,6 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
-  const [filteredTools, setFilteredTools] = useState(tools);
   const [areFiltersApplied, setAreFiltersApplied] = useState(false);
   const [areSortApplied, setAreSortApplied] = useState(false);
   const [currentSortOption, setCurrentSortOption] =
@@ -110,15 +97,14 @@ export default function HomeScreen() {
         setBrandLoading(false);
       } else {
         console.error("Error fetching art tools.");
+        setLoading(false);
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    getArtTools();
-  }, []);
   const applyFilters = (filters) => {
     setPriceFilter(filters.price);
     setGlassSurfaceFilter(filters.glassSurface);

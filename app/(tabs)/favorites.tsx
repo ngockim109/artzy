@@ -42,6 +42,7 @@ import BottomSheet, {
   BottomSheetModalProvider,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import SearchBarNotPage from "@/components/SearchBarNotPage";
 
 const Favorites = () => {
   const [favoriteTools, setFavoriteTools] = useState<ITool[]>([]); // State to store favorite tools
@@ -69,7 +70,8 @@ const Favorites = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isCheckBoxShow, setIsCheckBoxShow] = useState(false);
   const [isClearMode, setIsClearMode] = useState(false);
-
+  const [isSearch, setIsSearch] = useState<boolean>(false);
+  const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
   const isFocused = useIsFocused();
   const bottomSheetModalRemoveRef = useRef<BottomSheetModal>(null);
 
@@ -101,7 +103,7 @@ const Favorites = () => {
         setTools(response.data);
         setOriginalTools(response.data);
       } else {
-        console.error("Error fetching art tools: ", error);
+        console.error("Error fetching art tools!");
       }
     } catch (error) {
       console.error(error);
@@ -110,6 +112,7 @@ const Favorites = () => {
 
   const fetchFavorites = async () => {
     try {
+      setLoading(true);
       const storedFavorites = await AsyncStorage.getItem("favorites");
       if (storedFavorites) {
         const favoriteIds = JSON.parse(storedFavorites); // Array of favorite tool IDs
@@ -174,14 +177,20 @@ const Favorites = () => {
 
   const clearDeleteFields = () => {
     setSelectedItems({});
-    setClearMode(false);
-    setClearAllMode(false);
-    setIsModalVisible(false);
-    setIsClearMode(false);
+    clearSearchValue();
     setIsCheckBoxShow(false);
+    if (isModalVisible) {
+      setIsModalVisible(false);
+    }
     fetchFavorites();
   };
   useEffect(() => {
+    setSelectedItems({});
+    clearSearchValue();
+    setIsCheckBoxShow(false);
+    if (isModalVisible) {
+      setIsModalVisible(false);
+    }
     fetchFavorites();
   }, [isFocused]);
   useEffect(() => {
@@ -198,6 +207,35 @@ const Favorites = () => {
     // clearDeleteFields();
     setIsModalVisible(false);
   };
+
+  // handle search
+  const onChangeSearchValue = (text: string) => {
+    setSearchValue(text);
+    if (text.trim().length > 0) {
+      setIsSearch(true);
+    } else {
+      setIsSearch(false);
+    }
+  };
+  const clearSearchValue = () => {
+    setSearchValue("");
+    setIsSearch(false);
+    setIsSearchMode(false);
+    setIsClearMode(false);
+  };
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      const searchResults = favoriteTools.filter(
+        (tool) =>
+          tool.artName.toLowerCase().includes(searchValue.toLowerCase()) ||
+          tool.description.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setFavoriteTools(searchResults);
+    }
+    setIsSearch(false);
+    setIsSearchMode(true);
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ dark: "", light: "" }}
@@ -212,6 +250,15 @@ const Favorites = () => {
         >
           Favorites
         </ThemedText>
+        <View className="mt-3" style={{ position: "relative", zIndex: 100 }}>
+          <SearchBarNotPage
+            value={searchValue}
+            onChangeText={onChangeSearchValue}
+            handleSearch={handleSearch}
+            isSearch={isSearch}
+            clearSearchValue={clearSearchValue}
+          />
+        </View>
         {loading ? (
           <ActivityIndicator color={Colors.light.primary} />
         ) : favoriteTools.length > 0 ? (
