@@ -222,6 +222,9 @@ export default function HomeScreen() {
   useEffect(() => {
     getArtTools();
     loadFavoriteIds();
+    resetFilters();
+    resetSearch();
+    resetSorting();
   }, [isFocused]);
   return (
     <ParallaxScrollView

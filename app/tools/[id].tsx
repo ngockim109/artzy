@@ -1,19 +1,16 @@
-import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
+import { View, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FavoriteIcon from "@/components/atoms/FavoriteIcon";
-import { useIsFocused, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import { Colors } from "@/constants/Colors";
 import api from "@/api/api";
 import { ThemedText } from "@/components/ThemedText";
 import ITool from "@/interface/tool.interface";
 import Loading from "@/components/Loading";
-import { ThemedSafeAreaView } from "@/components/ThemedSafeAreaView";
 import PreviewFeedback from "@/components/PreviewFeedback";
 import { ThemedView } from "@/components/ThemedView";
-import IFeedback from "@/interface/feedback.interface";
 import { averageRating } from "@/utils/averageRating";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 import CommonBadge from "@/components/atoms/CommonBadge";
@@ -21,6 +18,7 @@ import { calculatePrice } from "@/utils/calculatePrice";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Tools from "@/components/Tools";
+import Empty from "@/components/Empty";
 
 const ToolDetail = () => {
   const { id } = useLocalSearchParams();
@@ -29,17 +27,14 @@ const ToolDetail = () => {
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [brandTools, setBrandTools] = useState<ITool[]>([]);
-  const [tools, setTools] = useState<ITool[]>([]);
 
   const router = useRouter();
-  const isFocused = useIsFocused();
 
   const getTools = async () => {
     try {
       setLoading(true);
       const response = await api.get("/art-tools/");
       if (response.status === 200) {
-        setTools(response.data);
         const fetchedTool = response.data.find((t: ITool) => t.id === id);
         if (fetchedTool) {
           setTool(fetchedTool);
@@ -129,6 +124,8 @@ const ToolDetail = () => {
           ),
         }}
       ></Stack.Screen>
+      {tool && tool !== null ? 
+      <>
       <View className="w-full py-3 bg-white">
         <Image
           source={{ uri: tool?.image }}
@@ -221,7 +218,7 @@ const ToolDetail = () => {
             onPress={() =>
               router.push({
                 pathname: "/tools/[id]/feedbacks",
-                params: { id: tool?.id },
+                params: { id: tool?.id ?? "" },
               })
             }
           >
@@ -274,6 +271,8 @@ const ToolDetail = () => {
           <Tools toolData={brandTools} />
         </>
       ) : null}
+      </>
+      : <Empty icon="frown" title="No product!" description="No longer this product! Try find other product!" noAction/>}
     </ParallaxScrollView>
   );
 };

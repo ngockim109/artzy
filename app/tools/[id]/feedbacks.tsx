@@ -19,28 +19,65 @@ import {
 } from "@/utils/averageRating";
 import RatingBar from "@/components/atoms/RatingBar";
 import FilterStar from "@/components/templates/FilterStar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FavoriteIcon from "@/components/atoms/FavoriteIcon";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const feedbacks = () => {
   const { id } = useLocalSearchParams();
   const [tool, setTool] = useState<ITool | null>(null);
-  const [avgRating, setAvgRating] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [avgRating, setAvgRating] = useState<number>(0);
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<IFeedback[]>([]);
 
   const router = useRouter();
+  const highlightIcon = useThemeColor({}, "highlight");
 
-  const getTool = async () => {
+  const getTools = async () => {
     try {
       setLoading(true);
-      const response = await api.get("/art-tools/" + id);
+      const response = await api.get("/art-tools/");
       if (response.status === 200) {
-        setTool(response.data);
-        setLoading(false);
-        setAvgRating(averageRating(response?.data?.feedbacks));
-        setFilteredFeedbacks(response.data.feedbacks);
+        const fetchedTool = response.data.find((t: ITool) => t.id === id);
+        if (fetchedTool) {
+          setTool(fetchedTool);
+          const storedFavorites = await AsyncStorage.getItem("favorites");
+          if (storedFavorites) {
+            // Filter tools to find favorites by matching their IDs
+            const favoriteIds = JSON.parse(storedFavorites);
+            setIsFavorite(favoriteIds.includes(fetchedTool.id));
+            setAvgRating(averageRating(fetchedTool?.feedbacks));
+            setFilteredFeedbacks(fetchedTool?.feedbacks);
+            setLoading(false);
+          } else {
+            setIsFavorite(false); // No favorites stored, so set to false
+            setLoading(false);
+          }
+        }
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
+    }
+  };
+  const toggleFavorite = async () => {
+    try {
+      const storedFavorites = await AsyncStorage.getItem("favorites");
+      let favoriteIds = storedFavorites ? JSON.parse(storedFavorites) : [];
+
+      if (isFavorite) {
+        // Remove from favorites
+        favoriteIds = favoriteIds.filter((favId: string) => favId !== tool?.id);
+      } else {
+        // Add to favorites
+        favoriteIds.push(tool?.id);
+      }
+
+      await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));
+      setIsFavorite(!isFavorite); // Toggle favorite state
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
     }
   };
 
@@ -57,14 +94,14 @@ const feedbacks = () => {
     }
   };
 
-  useEffect(() => {
-    getTool();
-  }, [id]);
   const checkFeedbacksComments = (feedbacks: IFeedback[]): boolean => {
     return feedbacks.some(
       (fb) => fb?.comment !== undefined && fb?.comment !== ""
     );
   };
+  useEffect(() => {
+    getTools();
+  }, [id]);
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "", dark: "" }}
@@ -85,7 +122,7 @@ const feedbacks = () => {
                   name="arrowleft"
                   size={24}
                   color="black"
-                  className="p-3 rounded-full"
+                  className="p-3 rounded-full mr-2"
                   style={{ backgroundColor: Colors.light.grayLight }}
                 />
               </TouchableOpacity>
