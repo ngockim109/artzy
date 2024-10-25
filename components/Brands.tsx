@@ -3,6 +3,7 @@ import React from "react";
 import IBrand from "@/interface/brand.interface";
 import BrandCard from "./atoms/BrandCard";
 import { useRouter } from "expo-router";
+import { ThemedText } from "./ThemedText";
 
 type BrandsProps = {
   DATA: IBrand[];
@@ -16,6 +17,7 @@ const Brands = ({ DATA }: BrandsProps) => {
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
         <TouchableOpacity
+          className="items-center justify-center"
           onPress={() =>
             router.push({
               pathname: `/brands/[id]`,
@@ -27,12 +29,13 @@ const Brands = ({ DATA }: BrandsProps) => {
             src={item?.brandImage}
             key={item?.id}
             style={{
-              width: 70,
-              height: 70,
+              width: 60,
+              height: 60,
               marginRight: 10,
               borderRadius: 50,
             }}
           />
+          <ThemedText className="text-center">{item?.brand}</ThemedText>
         </TouchableOpacity>
       )}
       keyExtractor={(item) => item?.id}
