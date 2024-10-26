@@ -1,10 +1,7 @@
 import React from "react";
 import ITool from "@/interface/tool.interface";
-import ToolCard from "@/components/molecules/ToolCard";
 import { ThemedView } from "./ThemedView";
-import { Colors } from "@/constants/Colors";
 import { calculatePrice } from "@/utils/calculatePrice";
-import { averageRating } from "@/utils/averageRating";
 import { FlatList } from "react-native";
 import ToolCardDeal from "./ToolCardDeal";
 
@@ -24,7 +21,6 @@ const LimitedTimeDealProducts = ({ toolData }: ToolsProps) => {
             oldPrice={item?.price}
             price={calculatePrice(item?.limitedTimeDeal, item?.price)}
             source={item?.image}
-            toolName={item?.artName}
             key={item?.id}
             id={item?.id}
             noCardWidth={true}
@@ -33,27 +29,6 @@ const LimitedTimeDealProducts = ({ toolData }: ToolsProps) => {
       )}
       keyExtractor={(item) => item?.id}
     />
-    // <ThemedView
-    //   className="flex-row flex-wrap justify-between"
-    //   lightColor={Colors.light.background}
-    //   darkColor={Colors.dark.background}
-    // >
-    //   {toolData?.map((item: ITool) => {
-    //     return (
-    //       <ToolCard
-    //         deal={item?.limitedTimeDeal}
-    //         numberOfRating={item?.feedbacks?.length ?? 0}
-    //         oldPrice={item?.price}
-    //         price={calculatePrice(item?.limitedTimeDeal, item?.price)}
-    //         rating={averageRating(item?.feedbacks)}
-    //         source={item?.image}
-    //         toolName={item?.artName}
-    //         key={item?.id}
-    //         id={item?.id}
-    //       />
-    //     );
-    //   })}
-    // </ThemedView>
   );
 };
 

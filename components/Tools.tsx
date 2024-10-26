@@ -5,18 +5,42 @@ import { ThemedView } from "./ThemedView";
 import { Colors } from "@/constants/Colors";
 import { calculatePrice } from "@/utils/calculatePrice";
 import { averageRating } from "@/utils/averageRating";
-
+import MasonryList from "@react-native-seoul/masonry-list";
 type ToolsProps = {
   toolData: ITool[];
 };
 const Tools = ({ toolData }: ToolsProps) => {
   return (
     <ThemedView
-      className="flex-row flex-wrap justify-between"
       lightColor={Colors.light.background}
       darkColor={Colors.dark.background}
     >
-      {toolData?.map((item: ITool) => {
+      <MasonryList
+        data={toolData}
+        keyExtractor={(item: ITool): string => item.id}
+        numColumns={2}
+        contentContainerStyle={{
+          alignSelf: "stretch",
+        }}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item, i }) => (
+          <ToolCard
+            deal={item?.limitedTimeDeal}
+            numberOfRating={item?.feedbacks?.length ?? 0}
+            oldPrice={item?.price}
+            price={calculatePrice(item?.limitedTimeDeal, item?.price)}
+            rating={averageRating(item?.feedbacks)}
+            source={item?.image}
+            toolName={item?.artName}
+            key={item?.id}
+            id={item?.id}
+            glassSurface={item?.glassSurface}
+            noCardWidth
+            index={i}
+          />
+        )}
+      />
+      {/* {toolData?.map((item: ITool) => {
         return (
           <ToolCard
             deal={item?.limitedTimeDeal}
@@ -31,7 +55,7 @@ const Tools = ({ toolData }: ToolsProps) => {
             glassSurface={item?.glassSurface}
           />
         );
-      })}
+      })} */}
     </ThemedView>
   );
 };

@@ -1,18 +1,5 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-  Pressable,
-  TextInput,
-} from "react-native";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { View, ActivityIndicator, TouchableOpacity } from "react-native";
 import AsyncStorage, {
   useAsyncStorage,
 } from "@react-native-async-storage/async-storage";
@@ -35,38 +22,23 @@ import { getSelectedItemCount } from "@/utils/handleClear";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
-import BottomSheet, {
+import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
   BottomSheetModal,
-  BottomSheetModalProvider,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import SearchBarNotPage from "@/components/SearchBarNotPage";
+import MasonryList from "@react-native-seoul/masonry-list";
 
 const Favorites = () => {
   const [favoriteTools, setFavoriteTools] = useState<ITool[]>([]); // State to store favorite tools
-  const [tools, setTools] = useState<ITool[]>([]);
-  const [originalTools, setOriginalTools] = useState<ITool[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [favoriteAsync, setFavoriteAsync] = useState();
-  const [loadingDeal, setLoadingDeal] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<string>("");
-  const [filteredTools, setFilteredTools] = useState(tools);
-  const [areFiltersApplied, setAreFiltersApplied] = useState(false);
-  const [areSortApplied, setAreSortApplied] = useState(false);
-  const [currentSortOption, setCurrentSortOption] =
-    useState<string>("relevant");
-
-  const [priceFilter, setPriceFilter] = useState<string>("Any price");
-  const [glassSurfaceFilter, setGlassSurfaceFilter] = useState<string>("All");
-  const [onSaleFilter, setOnSaleFilter] = useState<boolean | null>(null);
-  const { getItem, setItem } = useAsyncStorage("favorites");
   const [selectedItems, setSelectedItems] = useState<{
     [key: string]: boolean;
   }>({});
   const [clearAllMode, setClearAllMode] = useState(false);
-  const [clearMode, setClearMode] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isCheckBoxShow, setIsCheckBoxShow] = useState(false);
   const [isClearMode, setIsClearMode] = useState(false);
@@ -74,6 +46,9 @@ const Favorites = () => {
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
   const isFocused = useIsFocused();
   const bottomSheetModalRemoveRef = useRef<BottomSheetModal>(null);
+  const [originalFavoriteTools, setOriginalFavoriteTools] = useState<ITool[]>(
+    []
+  );
 
   const toggleModalVisibility = () => {
     if (isModalVisible) {
@@ -96,37 +71,27 @@ const Favorites = () => {
     []
   );
 
-  const getArtTools = async () => {
-    try {
-      const response = await api.get("art-tools");
-      if (response.status == 200) {
-        setTools(response.data);
-        setOriginalTools(response.data);
-      } else {
-        console.error("Error fetching art tools!");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const fetchFavorites = async () => {
     try {
       setLoading(true);
-      const storedFavorites = await AsyncStorage.getItem("favorites");
-      if (storedFavorites) {
-        const favoriteIds = JSON.parse(storedFavorites); // Array of favorite tool IDs
+      const response = await api.get("art-tools");
+      if (response.status == 200) {
+        const storedFavorites = await AsyncStorage.getItem("favorites");
+        if (storedFavorites) {
+          const favoriteIds = JSON.parse(storedFavorites); // Array of favorite tool IDs
 
-        // Filter tools to find favorites by matching their IDs
-        const favoriteTools = tools.filter((tool: ITool) =>
-          favoriteIds.includes(tool.id)
-        );
+          // Filter tools to find favorites by matching their IDs
+          const favorites = response.data.filter((tool: ITool) =>
+            favoriteIds.includes(tool.id)
+          );
 
-        setFavoriteTools(favoriteTools);
+          setFavoriteTools(favorites);
+          setOriginalFavoriteTools(favorites);
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch favorites from AsyncStorage", error);
-    } finally {
       setLoading(false);
     }
   };
@@ -171,9 +136,6 @@ const Favorites = () => {
     setSelectedItems({});
     setIsCheckBoxShow(false);
   };
-  useEffect(() => {
-    getArtTools();
-  }, []);
 
   const clearDeleteFields = () => {
     setSelectedItems({});
@@ -193,6 +155,9 @@ const Favorites = () => {
     }
     fetchFavorites();
   }, [isFocused]);
+  useEffect(() => {
+    fetchFavorites();
+  }, []);
   useEffect(() => {
     const selectedCount = getSelectedItemCount(selectedItems);
 
@@ -220,12 +185,13 @@ const Favorites = () => {
   const clearSearchValue = () => {
     setSearchValue("");
     setIsSearch(false);
+    setFavoriteTools(originalFavoriteTools);
     setIsSearchMode(false);
     setIsClearMode(false);
   };
   const handleSearch = () => {
     if (searchValue.trim()) {
-      const searchResults = favoriteTools.filter(
+      const searchResults = originalFavoriteTools.filter(
         (tool) =>
           tool.artName.toLowerCase().includes(searchValue.toLowerCase()) ||
           tool.description.toLowerCase().includes(searchValue.toLowerCase())
@@ -261,7 +227,7 @@ const Favorites = () => {
         </View>
         {loading ? (
           <ActivityIndicator color={Colors.light.primary} />
-        ) : favoriteTools.length > 0 ? (
+        ) : favoriteTools && favoriteTools?.length > 0 ? (
           <ThemedView className="my-3">
             {/* Button clear, clear all, remove */}
             <ThemedView
@@ -330,9 +296,52 @@ const Favorites = () => {
               </ThemedView>
             ) : null}
             <ThemedView className="flex-wrap flex-row justify-between">
-              {favoriteTools.map((item) => (
+              <MasonryList
+                data={favoriteTools}
+                keyExtractor={(item: ITool): string => item.id}
+                numColumns={2}
+                contentContainerStyle={{
+                  alignSelf: "stretch",
+                }}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, i }) => (
+                  <ToolCard
+                    index={i}
+                    deal={item?.limitedTimeDeal}
+                    numberOfRating={item?.feedbacks?.length ?? 0}
+                    oldPrice={item?.price}
+                    price={calculatePrice(item?.limitedTimeDeal, item?.price)}
+                    rating={averageRating(item?.feedbacks)}
+                    source={item?.image}
+                    toolName={item?.artName}
+                    key={item?.id}
+                    id={item?.id}
+                    glassSurface={item?.glassSurface}
+                    isChecked={!!selectedItems[item.id]}
+                    onPress={() => {
+                      setSelectedItems((prev) => ({
+                        ...prev,
+                        [item.id]: !prev[item.id], // Toggle selection
+                      }));
+                    }}
+                    onLongPress={() => {
+                      setIsCheckBoxShow(true);
+                      setIsClearMode(true);
+                      // setClearMode(true);
+                      setSelectedItems((prev) => ({
+                        ...prev,
+                        [item.id]: true,
+                      }));
+                    }}
+                    noCardWidth
+                    isShowCheckBox={isCheckBoxShow}
+                  />
+                )}
+              />
+              {/* {favoriteTools.map((item, i) => (
                 <View key={item.id} style={{ width: "48%" }}>
                   <ToolCard
+                    index={i}
                     deal={item?.limitedTimeDeal}
                     numberOfRating={item?.feedbacks?.length ?? 0}
                     oldPrice={item?.price}
@@ -363,7 +372,7 @@ const Favorites = () => {
                     isShowCheckBox={isCheckBoxShow}
                   />
                 </View>
-              ))}
+              ))} */}
             </ThemedView>
           </ThemedView>
         ) : (

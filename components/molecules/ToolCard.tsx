@@ -1,5 +1,5 @@
 import { View, Image, StyleSheet, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import CommonBadge from "@/components/atoms/CommonBadge";
 import { Colors } from "@/constants/Colors";
@@ -27,6 +27,7 @@ type ToolsProps = {
   isShowCheckBox?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
+  index: number;
 };
 const ToolCard = ({
   source,
@@ -43,6 +44,7 @@ const ToolCard = ({
   onPress,
   onLongPress,
   isShowCheckBox = false,
+  index,
 }: ToolsProps) => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { showNotification } = useNotification();
@@ -87,10 +89,15 @@ const ToolCard = ({
       console.error(error);
     }
   };
+  const randomBool = useMemo(() => Math.random() < 0.5, []);
   return (
     <>
       <View
-        style={[styles.card, !noCardWidth && styles.cardWidth]}
+        style={[
+          styles.card,
+          !noCardWidth && styles.cardWidth,
+          { marginLeft: index % 2 === 0 ? 0 : 12, marginTop: 12, flex: 1 },
+        ]}
         className="mb-5 rounded-md z-10"
         pointerEvents="box-none"
       >
@@ -122,9 +129,9 @@ const ToolCard = ({
         >
           <View>
             <Image
-              style={styles.image}
+              style={[{ height: randomBool ? 200 : 280, alignSelf: "stretch" }]}
               source={{ uri: source }}
-              resizeMode="contain"
+              resizeMode="center"
             />
 
             <View style={styles.cardContent}>
@@ -213,11 +220,6 @@ const ToolCard = ({
 };
 
 const styles = StyleSheet.create({
-  image: {
-    width: "100%",
-    height: 100,
-    marginBottom: 10,
-  },
   card: {
     shadowColor: "rgba(0, 0, 0, 0.24)",
     shadowOffset: { width: 0, height: 3 },

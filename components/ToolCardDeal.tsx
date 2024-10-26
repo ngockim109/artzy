@@ -7,7 +7,6 @@ import { router } from "expo-router";
 
 type ToolsProps = {
   source: string;
-  toolName: string;
   price: number;
   oldPrice: number;
   deal: number;
@@ -16,7 +15,6 @@ type ToolsProps = {
 };
 const ToolCardDeal = ({
   source,
-  toolName,
   price,
   oldPrice,
   deal,
@@ -46,14 +44,6 @@ const ToolCardDeal = ({
             />
 
             <View style={styles.cardContent}>
-              <ThemedText
-                lightColor={Colors.light.textCard}
-                darkColor={Colors.dark.textCard}
-                numberOfLines={2}
-              >
-                {toolName}
-              </ThemedText>
-
               {deal > 0 && (
                 <View className="w-28 my-1">
                   <CommonBadge text="Limited time deal" status="highlight" />
