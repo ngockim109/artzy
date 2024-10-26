@@ -12,12 +12,19 @@ import { useNavigation } from "@react-navigation/native"; // Use useNavigation f
 
 type NotificationProps = {
   message: string;
+  actionName: string;
   visible: boolean;
   onDismiss: () => void;
+  onPress: () => void;
 };
 
-const Notification = ({ message, visible, onDismiss }: NotificationProps) => {
-  const navigation = useNavigation(); // Access navigation object
+const Notification = ({
+  message,
+  actionName,
+  visible,
+  onDismiss,
+  onPress,
+}: NotificationProps) => {
   const translateY = new Animated.Value(100); // Start off-screen
 
   React.useEffect(() => {
@@ -52,13 +59,13 @@ const Notification = ({ message, visible, onDismiss }: NotificationProps) => {
     >
       <View style={styles.innerContainer}>
         <Text style={styles.notificationText}>{message}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("favorites")}>
+        <TouchableOpacity onPress={onPress}>
           <View style={styles.viewButton}>
             <ThemedText
               lightColor={Colors.light.white}
               darkColor={Colors.dark.white}
             >
-              View
+              {actionName}
             </ThemedText>
           </View>
         </TouchableOpacity>

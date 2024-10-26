@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import Notification from "./Notification";
+import { useNavigation } from "expo-router";
 
 type NotificationContextType = {
   showNotification: (message: string) => void;
@@ -10,6 +11,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(
 );
 
 export const NotificationProvider = ({ children }) => {
+  const navigation = useNavigation(); // Access navigation object
   const [notificationMessage, setNotificationMessage] = useState<string | null>(
     null
   );
@@ -31,6 +33,8 @@ export const NotificationProvider = ({ children }) => {
         message={notificationMessage || ""}
         visible={notificationVisible}
         onDismiss={() => setNotificationVisible(false)}
+        onPress={() => navigation.navigate("favorites")}
+        actionName="View"
       />
     </NotificationContext.Provider>
   );

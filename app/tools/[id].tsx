@@ -19,6 +19,7 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
+import { useNotification } from "@/components/atoms/NotificationContext";
 
 const ToolDetail = () => {
   const { id } = useLocalSearchParams();
@@ -30,6 +31,8 @@ const ToolDetail = () => {
 
   const router = useRouter();
   const isFocused = useIsFocused();
+  const { showNotification } = useNotification();
+
   const getTools = async () => {
     try {
       setLoading(true);
@@ -68,9 +71,11 @@ const ToolDetail = () => {
       if (isFavorite) {
         // Remove from favorites
         favoriteIds = favoriteIds.filter((favId: string) => favId !== tool?.id);
+        showNotification(`Item removed successfully from favorites!`);
       } else {
         // Add to favorites
         favoriteIds.push(tool?.id);
+        showNotification(`Item added successfully to favorites!`);
       }
 
       await AsyncStorage.setItem("favorites", JSON.stringify(favoriteIds));

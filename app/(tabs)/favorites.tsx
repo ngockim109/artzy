@@ -30,6 +30,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import SearchBarNotPage from "@/components/SearchBarNotPage";
 import MasonryList from "@react-native-seoul/masonry-list";
+import Notification from "@/components/atoms/Notification";
 
 const Favorites = () => {
   const [favoriteTools, setFavoriteTools] = useState<ITool[]>([]); // State to store favorite tools
@@ -49,6 +50,8 @@ const Favorites = () => {
   const [originalFavoriteTools, setOriginalFavoriteTools] = useState<ITool[]>(
     []
   );
+  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [removedItems, setRemovedItems] = useState<ITool[]>([]);
 
   const toggleModalVisibility = () => {
     if (isModalVisible) {
@@ -108,6 +111,11 @@ const Favorites = () => {
       const storedFavorites = await AsyncStorage.getItem("favorites");
       const favoriteIds = storedFavorites ? JSON.parse(storedFavorites) : [];
 
+      // Identify items being removed
+      const itemsToRemove = favoriteTools.filter(
+        (tool) => selectedItems[tool.id]
+      );
+      setRemovedItems(itemsToRemove);
       // Remove selected favorites from the list
       const updatedFavorites = favoriteIds.filter((id) => !selectedItems[id]);
 
@@ -116,11 +124,35 @@ const Favorites = () => {
       clearDeleteFields();
       setIsModalVisible(false);
       bottomSheetModalRemoveRef.current?.close();
+
+      setNotificationVisible(true);
     } catch (error) {
       console.error("Error removing favorites:", error);
     }
   };
+  const handleUndoRemove = async () => {
+    try {
+      const storedFavorites = await AsyncStorage.getItem("favorites");
+      const favoriteIds = storedFavorites ? JSON.parse(storedFavorites) : [];
 
+      // Re-add removed items to AsyncStorage
+      const restoredFavorites = [
+        ...favoriteIds,
+        ...removedItems.map((item) => item.id),
+      ];
+      await AsyncStorage.setItem(
+        "favorites",
+        JSON.stringify(restoredFavorites)
+      );
+
+      // Update UI by adding removed items back
+      setFavoriteTools((prev) => [...prev, ...removedItems]);
+      setRemovedItems([]); // Clear removed items state
+      setNotificationVisible(false); // Hide notification
+    } catch (error) {
+      console.error("Error undoing remove:", error);
+    }
+  };
   const handleClickClearAllButton = () => {
     setIsClearMode(true);
     setClearAllMode((prevClearAllMode) => {
@@ -295,6 +327,16 @@ const Favorites = () => {
                 </TouchableOpacity>
               </ThemedView>
             ) : null}
+            <ThemedView className="flex-row justify-end mt-1">
+              <ThemedText
+                type="blurText"
+                className="text-end"
+                lightColor={Colors.light.gray}
+                darkColor={Colors.dark.gray}
+              >
+                {favoriteTools?.length} data
+              </ThemedText>
+            </ThemedView>
             <ThemedView className="flex-wrap flex-row justify-between">
               <MasonryList
                 data={favoriteTools}
@@ -386,6 +428,13 @@ const Favorites = () => {
           </ThemedView>
         )}
       </View>
+      <Notification
+        message="Items removed from favorites"
+        visible={notificationVisible}
+        onDismiss={() => setNotificationVisible(false)}
+        onPress={handleUndoRemove}
+        actionName="Undo"
+      />
       <BottomSheetModal
         ref={bottomSheetModalRemoveRef}
         index={0}
