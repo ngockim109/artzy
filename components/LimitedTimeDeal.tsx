@@ -6,6 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { calculatePrice } from "@/utils/calculatePrice";
 import { averageRating } from "@/utils/averageRating";
 import { FlatList } from "react-native";
+import ToolCardDeal from "./ToolCardDeal";
 
 type ToolsProps = {
   toolData: ArrayLike<ITool>;
@@ -18,18 +19,15 @@ const LimitedTimeDealProducts = ({ toolData }: ToolsProps) => {
       showsHorizontalScrollIndicator={false}
       renderItem={({ item }) => (
         <ThemedView style={{ width: 190, marginRight: 8 }}>
-          <ToolCard
+          <ToolCardDeal
             deal={item?.limitedTimeDeal}
-            numberOfRating={item?.feedbacks?.length ?? 0}
             oldPrice={item?.price}
             price={calculatePrice(item?.limitedTimeDeal, item?.price)}
-            rating={averageRating(item?.feedbacks)}
             source={item?.image}
             toolName={item?.artName}
             key={item?.id}
             id={item?.id}
             noCardWidth={true}
-            glassSurface={item?.glassSurface}
           />
         </ThemedView>
       )}

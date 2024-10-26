@@ -21,6 +21,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
 import SearchBarNotPage from "@/components/SearchBarNotPage";
 import React from "react";
+import LimitedTimeDealProducts from "@/components/LimitedTimeDeal";
+import { ThemedView } from "@/components/ThemedView";
 
 export default function HomeScreen() {
   const [tools, setTools] = useState<ITool[]>([]);
@@ -45,6 +47,7 @@ export default function HomeScreen() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [isSearch, setIsSearch] = useState<boolean>(false);
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
+  const [toolDeal, setToolDeal] = useState<ITool[]>([]);
 
   const isFocused = useIsFocused();
 
@@ -82,6 +85,9 @@ export default function HomeScreen() {
       if (response.status == 200) {
         setTools(response.data);
         setOriginalTools(response.data);
+        setToolDeal(
+          response.data.filter((data: ITool) => data.limitedTimeDeal > 0)
+        );
         setLoading(false);
         const brandData = response.data.map((data: ITool) => ({
           id: data.brand,
@@ -234,48 +240,66 @@ export default function HomeScreen() {
           clearSearchValue={clearSearchValue}
         />
       </View>
-      <ThemedText
-        type="subtitle"
-        lightColor={Colors.light.subtitle}
-        darkColor={Colors.dark.subtitle}
-      >
-        Brands
-      </ThemedText>
-
-      {brandLoading ? (
-        <LoadingSmall />
-      ) : brands === null || brands.length <= 0 ? null : (
-        <Brands DATA={brands} />
-      )}
-      <ThemedText
-        type="subtitle"
-        lightColor={Colors.light.subtitle}
-        darkColor={Colors.dark.subtitle}
-      >
-        Products
-      </ThemedText>
-      <Filters onFilterChange={applyFilters} brands={brands} />
-      <SortTools onSortChange={handleSortChange} />
       {loading ? (
         <LoadingSmall />
-      ) : renderData == null || renderData?.length <= 0 ? (
-        <Empty
-          icon="frown"
-          description="No products here!"
-          title="Empty"
-          noAction
-        />
       ) : (
         <>
+          {brands === null || brands.length <= 0 ? null : (
+            <>
+              <ThemedText
+                type="subtitle"
+                lightColor={Colors.light.subtitle}
+                darkColor={Colors.dark.subtitle}
+              >
+                Brands
+              </ThemedText>
+              <Brands DATA={brands} />
+            </>
+          )}
+
+          {toolDeal === null || toolDeal.length <= 0 ? null : (
+            <>
+              <ThemedText
+                type="subtitle"
+                lightColor={Colors.light.subtitle}
+                darkColor={Colors.dark.subtitle}
+              >
+                Limited Time Deal
+              </ThemedText>
+              <ThemedView>
+                <LimitedTimeDealProducts toolData={toolDeal} />
+              </ThemedView>
+            </>
+          )}
           <ThemedText
-            className="text-right"
-            type="blurText"
-            lightColor={Colors.light.gray}
-            darkColor={Colors.dark.gray}
+            type="subtitle"
+            lightColor={Colors.light.subtitle}
+            darkColor={Colors.dark.subtitle}
           >
-            Showing {renderData.length} data
+            Products
           </ThemedText>
-          <Tools toolData={renderData} />
+          <Filters onFilterChange={applyFilters} brands={brands} />
+          <SortTools onSortChange={handleSortChange} />
+          {renderData == null || renderData?.length <= 0 ? (
+            <Empty
+              icon="frown"
+              description="No products here!"
+              title="Empty"
+              noAction
+            />
+          ) : (
+            <>
+              <ThemedText
+                className="text-right"
+                type="blurText"
+                lightColor={Colors.light.gray}
+                darkColor={Colors.dark.gray}
+              >
+                Showing {renderData.length} data
+              </ThemedText>
+              <Tools toolData={renderData} />
+            </>
+          )}
         </>
       )}
     </ParallaxScrollView>
