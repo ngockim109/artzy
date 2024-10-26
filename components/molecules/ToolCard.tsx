@@ -101,15 +101,18 @@ const ToolCard = ({
         className="mb-5 rounded-md z-10"
         pointerEvents="box-none"
       >
-        <View style={styles.favoriteContainer}>
-          <FavoriteIcon
-            favorite={isFavorite}
-            color={Colors.light.highlight}
-            style={{ backgroundColor: Colors.light.grayLight }}
-            className="absolute right-1 top-1 rounded-full p-2 w-9 h-9"
-            onPress={handleFavoritePress}
-          />
-        </View>
+        {isShowCheckBox ? null : (
+          <View style={styles.favoriteContainer}>
+            <FavoriteIcon
+              favorite={isFavorite}
+              color={Colors.light.highlight}
+              style={{ backgroundColor: Colors.light.grayLight }}
+              className="absolute right-1 top-1 rounded-full p-2 w-9 h-9"
+              onPress={handleFavoritePress}
+            />
+          </View>
+        )}
+
         {isShowCheckBox ? (
           <Pressable onPress={onPress} style={styles.checkboxContainer}>
             <View style={[styles.checkbox, isChecked && styles.checked]}>
