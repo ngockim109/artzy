@@ -92,6 +92,7 @@ const Favorites = () => {
           setOriginalFavoriteTools(favorites);
           setLoading(false);
         }
+        setLoading(false);
       }
     } catch (error) {
       console.error("Failed to fetch favorites from AsyncStorage", error);
