@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Image } from "react-native";
+import { View, TouchableOpacity, Image, Modal } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Tools from "@/components/Tools";
 import Empty from "@/components/Empty";
 import { useNotification } from "@/components/atoms/NotificationContext";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const ToolDetail = () => {
   const { id } = useLocalSearchParams();
@@ -28,7 +29,7 @@ const ToolDetail = () => {
   const [loading, setLoading] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [brandTools, setBrandTools] = useState<ITool[]>([]);
-
+  const [isShowMenu, setIsShowMenu] = useState(false);
   const router = useRouter();
   const isFocused = useIsFocused();
   const { showNotification } = useNotification();
@@ -116,17 +117,72 @@ const ToolDetail = () => {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <TouchableOpacity onPress={toggleFavorite}>
-              <View
-                className="rounded-full p-3"
-                style={{ backgroundColor: Colors.light.grayLight }}
+            <View className="relative flex-row items-center gap-1">
+              <TouchableOpacity onPress={toggleFavorite}>
+                <View
+                  className="rounded-full p-3"
+                  style={{ backgroundColor: Colors.light.grayLight }}
+                >
+                  <FavoriteIcon
+                    favorite={isFavorite}
+                    color={
+                      theme ? Colors.light.highlight : Colors.dark.highlight
+                    }
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setIsShowMenu(true)}>
+                <Entypo name="dots-three-vertical" size={24} color="black" />
+              </TouchableOpacity>
+              <Modal
+                transparent
+                visible={isShowMenu}
+                animationType="fade"
+                onRequestClose={() => setIsShowMenu(false)}
               >
-                <FavoriteIcon
-                  favorite={isFavorite}
-                  color={theme ? Colors.light.highlight : Colors.dark.highlight}
-                />
-              </View>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-start",
+                    alignItems: "flex-end",
+                    paddingTop: 60,
+                    paddingRight: 15,
+                  }}
+                  onPress={() => setIsShowMenu(false)}
+                >
+                  <View
+                    style={{
+                      width: 150,
+                      backgroundColor: "white",
+                      padding: 10,
+                      borderRadius: 8,
+                      elevation: 5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>Home</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/favorites");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>
+                        Favorites
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            </View>
           ),
         }}
       ></Stack.Screen>

@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -12,6 +12,7 @@ import Empty from "@/components/Empty";
 import Tools from "@/components/Tools";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import LimitedTimeDealProducts from "@/components/LimitedTimeDeal";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const Brands = () => {
   const { id, brandImage } = useLocalSearchParams();
@@ -20,6 +21,7 @@ const Brands = () => {
   const [loading, setLoading] = useState(false);
   const [loadingDeal, setLoadingDeal] = useState(false);
   const router = useRouter();
+  const [isShowMenu, setIsShowMenu] = useState(false);
 
   const getTools = async () => {
     try {
@@ -54,7 +56,7 @@ const Brands = () => {
           headerTransparent: false,
           headerTitle: "",
           headerLeft: () => (
-            <>
+            <View className="flex-row">
               <TouchableOpacity
                 onPress={() => {
                   router.back();
@@ -88,7 +90,62 @@ const Brands = () => {
 
                 <ThemedText type="defaultSemiBold">{id}</ThemedText>
               </ThemedView>
-            </>
+            </View>
+          ),
+          headerRight: () => (
+            <View className="relative flex-row items-center gap-1">
+              <TouchableOpacity onPress={() => setIsShowMenu(true)}>
+                <Entypo name="dots-three-vertical" size={24} color="black" />
+              </TouchableOpacity>
+              <Modal
+                transparent
+                visible={isShowMenu}
+                animationType="fade"
+                onRequestClose={() => setIsShowMenu(false)}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-start",
+                    alignItems: "flex-end",
+                    paddingTop: 60,
+                    paddingRight: 15,
+                  }}
+                  onPress={() => setIsShowMenu(false)}
+                >
+                  <View
+                    style={{
+                      width: 150,
+                      backgroundColor: "white",
+                      padding: 10,
+                      borderRadius: 8,
+                      elevation: 5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>Home</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/favorites");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>
+                        Favorites
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            </View>
           ),
         }}
       ></Stack.Screen>

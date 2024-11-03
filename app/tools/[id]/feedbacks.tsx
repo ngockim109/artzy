@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Modal } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -24,6 +24,7 @@ import FavoriteIcon from "@/components/atoms/FavoriteIcon";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import SortFeedbacks from "@/components/SortFeedbacks";
 import { sortFeedbacks } from "@/utils/sortFeedbacks";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const feedbacks = () => {
   const { id } = useLocalSearchParams();
@@ -35,7 +36,7 @@ const feedbacks = () => {
   const [currentSortOption, setCurrentSortOption] =
     useState<string>("relevant");
   const [areSortApplied, setAreSortApplied] = useState(false);
-
+  const [isShowMenu, setIsShowMenu] = useState(false);
   const router = useRouter();
   const highlightIcon = useThemeColor({}, "highlight");
 
@@ -140,6 +141,61 @@ const feedbacks = () => {
               </TouchableOpacity>
               <ThemedText type="subtitle">Customer Reviews</ThemedText>
             </>
+          ),
+          headerRight: () => (
+            <View className="relative flex-row items-center gap-1">
+              <TouchableOpacity onPress={() => setIsShowMenu(true)}>
+                <Entypo name="dots-three-vertical" size={24} color="black" />
+              </TouchableOpacity>
+              <Modal
+                transparent
+                visible={isShowMenu}
+                animationType="fade"
+                onRequestClose={() => setIsShowMenu(false)}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-start",
+                    alignItems: "flex-end",
+                    paddingTop: 60,
+                    paddingRight: 15,
+                  }}
+                  onPress={() => setIsShowMenu(false)}
+                >
+                  <View
+                    style={{
+                      width: 150,
+                      backgroundColor: "white",
+                      padding: 10,
+                      borderRadius: 8,
+                      elevation: 5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>Home</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsShowMenu(false);
+                        router.push("/favorites");
+                      }}
+                      style={{ paddingVertical: 5 }}
+                    >
+                      <ThemedText style={{ fontSize: 16 }}>
+                        Favorites
+                      </ThemedText>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              </Modal>
+            </View>
           ),
         }}
       ></Stack.Screen>
